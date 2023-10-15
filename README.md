@@ -1,7 +1,7 @@
 # E-Store: Online Disc Golf Store
 <!-- Modify this document to expand any and all sections that are applicable for a better understanding from your users/testers/collaborators (remove this comment and other instructions areas for your FINAL release) -->
 
-An online E-store system built in Java 8=>11 and ___ _replace with other platform requirements_ ___
+An online E-store system built in Java 8=>11
   
 ## Team
 
@@ -24,13 +24,9 @@ An online E-store system built in Java 8=>11 and ___ _replace with other platfor
 1. Clone the repository and go to the root directory.
 2. Execute `mvn compile exec:java`
 3. Open in your browser `http://localhost:8080/`
-4.  _add any other steps required or examples of how to use/run_
 
 ## Known bugs and disclaimers
-(It may be the case that your implementation is not perfect.)
-
-Document any known bug or nuisance.
-If any shortcomings, make clear what these are and where they are located.
+None
 
 ## How to test it
 
