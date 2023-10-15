@@ -1,0 +1,16 @@
+<h3>Create a Product</h3>
+<div class = "dropdown">
+ <label for="type">Type of Disc:    </label>
+ <select [(ngModel)]="type"> 
+    <option>Distance Driver</option>
+    <option>Midrange</option>
+    <option>Fairway Driver</option>
+    <option >Putter</option>
+ </select>
+</div>
+<input id="quantity" [(ngModel)]="quantity" placeholder="quantity">
+<input id="price" [(ngModel)]="price" placeholder="price">
+<input id="color" [(ngModel)]="color" placeholder="color">
+<input id="weight" [(ngModel)]="weight" placeholder="weight">
+<button type="create" (click)="createProduct(type,quantity,price,weight,color)">Create</button>
+<button type="go back" (click)="goBack()">Go Back</button>

@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LessonController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.controller</a> &gt; <span class="el_source">LessonController.java</span></div><h1>LessonController.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.discgolf.api.discgolfapi.model.Lesson;
+import com.discgolf.api.discgolfapi.persistence.LessonDAO;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Handles the REST API requests for the Lesson resource
+ * &lt;p&gt;
+ * {@literal @}RestController Spring annotation identifies this class as a REST API
+ * method handler to the Spring framework
+ * 
+ * @author SWEN Faculty + coolname
+ */
+
+@RestController
+@RequestMapping(&quot;lessons&quot;)
+public class LessonController {
+<span class="fc" id="L34">    private static final Logger LOG = Logger.getLogger(LessonController.class.getName());</span>
+    private LessonDAO lessonDao;
+
+    /**
+     * Creates a REST API controller to reponds to requests
+     * 
+     * @param lessonDao The {@link LessonDAO Lesson Data Access Object} to perform CRUD operations
+     * &lt;br&gt;
+     * This dependency is injected by the Spring Framework
+     */
+<span class="fc" id="L44">    public LessonController(LessonDAO lessonDao) {</span>
+<span class="fc" id="L45">        this.lessonDao = lessonDao;</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * Responds to the GET request for a {@linkplain Lesson lesson} for the given id
+     * 
+     * @param id The id used to locate the {@link Lesson lesson}
+     * 
+     * @return ResponseEntity with {@link Lesson lesson} object and HTTP status of OK if found&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Lesson&gt; getLesson(@PathVariable int id) {
+<span class="fc" id="L59">        LOG.info(&quot;GET /lessons/&quot; + id);</span>
+        try {
+<span class="fc" id="L61">            Lesson lesson = lessonDao.getLesson(id);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            if (lesson != null)</span>
+<span class="fc" id="L63">                return new ResponseEntity&lt;Lesson&gt;(lesson,HttpStatus.OK);</span>
+            else
+<span class="fc" id="L65">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L67">        catch(IOException e) {</span>
+<span class="fc" id="L68">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L69">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @GetMapping(&quot;/dates&quot;)
+    public ResponseEntity&lt;Lesson[]&gt; getLessonsOnDate(@RequestParam String date) {
+<span class="fc" id="L75">        LOG.info(&quot;GET /lessons/dates?date=&quot;+date);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L79">            Lesson[] lessons = lessonDao.getLessonsOnDate(date);</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">            if (lessons != null)</span>
+<span class="fc" id="L81">                return new ResponseEntity&lt;Lesson[]&gt;(lessons, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L83">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L85">        catch(IOException e) {</span>
+<span class="fc" id="L86">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L87">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+    /**
+     * Responds to the GET request for {@linkplain Lesson lessons} associated with the given username
+     * 
+     * @param username The username used to locate the {@link Lesson lesson}
+     * @return ResponseEntity with array of {@link Lesson lesson} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/user/{username}&quot;)
+    public ResponseEntity&lt;Lesson[]&gt; getLessonByUser(@PathVariable String username) {
+<span class="fc" id="L100">        LOG.info(&quot;GET /lessons/user/&quot; + username);</span>
+        try {
+<span class="fc" id="L102">            Lesson[] lessons = lessonDao.getLessonsByUser(username);</span>
+<span class="fc" id="L103">            return new ResponseEntity&lt;Lesson[]&gt;(lessons, HttpStatus.OK);</span>
+        }
+<span class="fc" id="L105">        catch(IOException e) {</span>
+<span class="fc" id="L106">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L107">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for all {@linkplain Lesson lessons}
+     * 
+     * @return ResponseEntity with array of {@link Lesson lesson} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;&quot;)
+    public ResponseEntity&lt;Lesson[]&gt; getLessons() {
+<span class="fc" id="L120">        LOG.info(&quot;GET /lessons&quot;);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L124">            Lesson[] lessons = lessonDao.getLessons();</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">            if (lessons != null)</span>
+<span class="fc" id="L126">                return new ResponseEntity&lt;Lesson[]&gt;(lessons, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L128">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L130">        catch(IOException e) {</span>
+<span class="fc" id="L131">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L132">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for all {@linkplain Lesson lessons} which has the same type
+     * 
+     * @param type The type parameter which contains the int_type used to find the {@link Lesson lessons}
+     * 
+     * @return ResponseEntity with array of {@link Lesson lesson} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     * &lt;p&gt;
+     * Example: Find all lessons that have the type 1
+     * GET http://localhost:8080/lessons/?title=form
+     */
+    @GetMapping(&quot;/&quot;)
+    public ResponseEntity&lt;Lesson[]&gt; searchLessons(@RequestParam String title) {
+<span class="fc" id="L150">        LOG.info(&quot;GET /lessons/?title=&quot;+title);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L154">            Lesson[] lessons = lessonDao.findLessons(title);</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            if (lessons != null)</span>
+<span class="fc" id="L156">                return new ResponseEntity&lt;Lesson[]&gt;(lessons, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L158">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L160">        catch(IOException e) {</span>
+<span class="fc" id="L161">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L162">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Creates a {@linkplain Lesson lesson} with the provided lesson object
+     * 
+     * @param lesson - The {@link Lesson lesson} to create
+     * 
+     * @return ResponseEntity with created {@link Lesson lesson} object and HTTP status of CREATED&lt;br&gt;
+     * ResponseEntity with HTTP status of CONFLICT if {@link Lesson lesson} object already exists&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PostMapping(&quot;&quot;)
+    public ResponseEntity&lt;Lesson&gt; createLesson(@RequestBody Lesson lesson) {
+<span class="fc" id="L177">        LOG.info(&quot;POST /lessons &quot; + lesson);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L181">            Lesson newLesson = lessonDao.createLesson(lesson);</span>
+<span class="fc bfc" id="L182" title="All 2 branches covered.">            if (newLesson != null)</span>
+<span class="fc" id="L183">                return new ResponseEntity&lt;Lesson&gt;(newLesson, HttpStatus.CREATED);</span>
+            else
+<span class="fc" id="L185">                return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
+        }
+<span class="fc" id="L187">        catch(IOException e) {</span>
+<span class="fc" id="L188">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L189">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Updates the {@linkplain Lesson lesson} with the provided {@linkplain Lesson lesson} object, if it exists
+     * 
+     * @param lesson The {@link Lesson lesson} to update
+     * 
+     * @return ResponseEntity with updated {@link Lesson lesson} object and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;&quot;)
+    public ResponseEntity&lt;Lesson&gt; updateLesson(@RequestBody Lesson lesson) {
+<span class="fc" id="L204">        LOG.info(&quot;PUT /lessons &quot; + lesson);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L208">            Lesson updatedLesson = lessonDao.updateLesson(lesson);</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">            if (updatedLesson != null)</span>
+<span class="fc" id="L210">                return new ResponseEntity&lt;Lesson&gt;(updatedLesson, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L212">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L214">        catch(IOException e) {</span>
+<span class="fc" id="L215">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L216">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Deletes a {@linkplain Lesson lesson} with the given id
+     * 
+     * @param id The id of the {@link Lesson lesson} to deleted
+     * 
+     * @return ResponseEntity HTTP status of OK if deleted&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Lesson&gt; deleteLesson(@PathVariable int id) {
+<span class="fc" id="L231">        LOG.info(&quot;DELETE /lessons/&quot; + id);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L235">            boolean deleted = lessonDao.deleteLesson(id);</span>
+<span class="fc bfc" id="L236" title="All 2 branches covered.">            if (deleted)</span>
+<span class="fc" id="L237">                return new ResponseEntity&lt;&gt;(HttpStatus.OK);</span>
+            else
+<span class="fc" id="L239">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L241">        catch(IOException e) {</span>
+<span class="fc" id="L242">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L243">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

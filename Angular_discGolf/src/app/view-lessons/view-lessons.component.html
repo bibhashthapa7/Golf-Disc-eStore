@@ -1,0 +1,39 @@
+<div class="container">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Lesson ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Days</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Price</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let lesson of lessons">
+                <td id="lessonId">{{lesson.id}}</td>
+                <td><input id="lessonTitle{{lesson.id}}" value={{lesson.title}}></td>
+                <td><input id="lessonDescription{{lesson.id}}" value={{lesson.description}}></td>
+                <td><input id="lessonDays{{lesson.id}}" value={{lesson.days}}></td>
+                <td><input class="btn" style="background-color: white; color: slategray; width: 120px;" type="date" id="lessonStartDate{{lesson.id}}" name="lessons-start" [value]="lesson.startDate"></td>
+                <td><input class="btn" style="background-color: white; color: slategray; width: 120px;" type="date" id="lessonEndDate{{lesson.id}}" name="lessons-end" [value]="lesson.endDate"></td>
+                <td><input id="lessonPrice{{lesson.id}}" value={{lesson.price}}></td>
+                <td><button class="btn" (click)="updateLesson(lesson.id)">Save</button></td>
+                <td><button class="btn" (click)="deleteLesson(lesson.id)">Delete</button></td>
+            </tr>
+            <tr>
+                <td>✎ New</td>
+                <td><input id="title" [(ngModel)]="lessonTitle" placeholder="title"></td>
+                <td><input id="description" [(ngModel)]="lessonDescription" placeholder="description"></td>
+                <td><input id="days" [(ngModel)]="lessonDays" placeholder="days"></td>
+                <td><input class="btn" style="background-color: white; color: slategray; width: 120px;" type="date" id="startDate" min="2022-11-01" max="2023-06-01" [(ngModel)]="lessonStartDate" placeholder="MM/DD/YYYY"></td>
+                <td><input class="btn" style="background-color: white; color: slategray; width: 120px;" type="date" id="endDate" min="2022-11-01" max="2023-06-01" [(ngModel)]="lessonEndDate" placeholder="MM/DD/YYYY"></td>
+                <td><input id="price" [(ngModel)]="lessonPrice" placeholder="price"></td>
+                <td><button class="btn" type="create" (click)="createLesson(lessonTitle,lessonDescription,lessonDays,lessonStartDate,lessonEndDate,lessonPrice)">Create</button></td>
+            </tr>
+    </table>
+</div>

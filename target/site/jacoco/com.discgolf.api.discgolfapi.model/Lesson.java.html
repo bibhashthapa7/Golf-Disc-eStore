@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Lesson.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.model</a> &gt; <span class="el_source">Lesson.java</span></div><h1>Lesson.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.model;
+
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * Lesson object that represents lessons/coaching session for a disc golf store
+ * 
+ * @author RF
+ */
+public class Lesson {
+
+    /* fields */
+    @JsonProperty(&quot;id&quot;) private final int id;
+    @JsonProperty(&quot;username&quot;) private String username;
+    @JsonProperty(&quot;title&quot;) private String title;
+    @JsonProperty(&quot;description&quot;) private String description;
+    @JsonProperty(&quot;days&quot;) private String days;
+    @JsonProperty(&quot;startDate&quot;) private String startDate;
+    @JsonProperty(&quot;endDate&quot;) private String endDate;
+    @JsonProperty(&quot;price&quot;) private double price;
+
+    /**
+     * Constructor to create a lesson object.
+     * @param id id of lesson
+     * @param title title of lesson
+     * @param description description of what the lesson goes over
+     * @param days what day of week lesson is held (i.e MWF)
+     * @param startDate when the lesson starts
+     * @param endDate when the lesson ends end
+     * @param price how much it does
+     */
+    public Lesson(@JsonProperty(&quot;id&quot;) int id, @JsonProperty(&quot;username&quot;) String username, @JsonProperty(&quot;title&quot;) String title, 
+                  @JsonProperty(&quot;description&quot;) String description, @JsonProperty(&quot;days&quot;) String days,
+                  @JsonProperty(&quot;startDate&quot;) String startDate, @JsonProperty(&quot;endDate&quot;) String endDate,
+<span class="fc" id="L37">                  @JsonProperty(&quot;price&quot;) double price) {    </span>
+<span class="fc" id="L38">        this.id = id;</span>
+<span class="fc" id="L39">        this.username = username;</span>
+<span class="fc" id="L40">        this.title = title;</span>
+<span class="fc" id="L41">        this.description = description;</span>
+<span class="fc" id="L42">        this.days = days;</span>
+<span class="fc" id="L43">        this.startDate = startDate;</span>
+<span class="fc" id="L44">        this.endDate = endDate;</span>
+<span class="fc" id="L45">        this.price = price;</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * get the lesson's id
+     * 
+     * @return id
+     */
+    public int getId() {
+<span class="fc" id="L54">        return this.id;</span>
+    }
+
+    /**
+     * get the associated username
+     * 
+     * @return The associated username
+     */
+    public String getUsername() {
+<span class="fc" id="L63">        return this.username;</span>
+    }
+
+    /**
+     * updates the associated username
+     * @param username updated associated username
+     */
+    public void setUsername(String username) {
+<span class="fc" id="L71">        this.username = username;</span>
+<span class="fc" id="L72">    }</span>
+
+
+    /**
+     * gets the lesson's title
+     * 
+     * @return lesson title
+     */
+    public String getTitle() {
+<span class="fc" id="L81">        return this.title;</span>
+    }
+
+    /**
+     * updates the lesson title
+     * @param title updated lesson title
+     */
+    public void setTitle(String title) {
+<span class="fc" id="L89">        this.title = title;</span>
+<span class="fc" id="L90">    }</span>
+
+    /**
+     * gets the description of the lesson
+     * @return gets the description of the lesson
+     */
+    public String getDescription() {
+<span class="fc" id="L97">        return this.description;</span>
+    }
+
+    /**
+     * sets the description of the lesson
+     * @param description new desc of lesson
+     */
+    public void setDescription(String description) {
+<span class="fc" id="L105">        this.description = description;</span>
+<span class="fc" id="L106">    }</span>
+
+    /**
+     * gets the string representation of when the 
+     * lesson is held
+     */
+    public String getDays() {
+<span class="fc" id="L113">        return this.days;</span>
+    }
+
+    /**
+     * updates the days of week lesson is held
+     * @param days new days held
+     */
+    public void setDays(String days) {
+<span class="fc" id="L121">        this.days = days;</span>
+<span class="fc" id="L122">    }</span>
+
+    /**
+     * gets the start date of the lesson
+     * @return start date of the lesson
+     */
+    public String getStartDate() {
+<span class="fc" id="L129">        return this.startDate;</span>
+    }
+
+    /**
+     * Updates the start date of a lesson
+     * 
+     * @param startDate new start date
+     */
+    public void setStartDate(String startDate) {
+<span class="fc" id="L138">        this.startDate = startDate;</span>
+<span class="fc" id="L139">    }</span>
+
+    /**
+     * gets end date of a lesson
+     * @return end date of a lesson
+     */
+    public String getEndDate() {
+<span class="fc" id="L146">        return this.endDate;</span>
+    }
+
+    /**
+     * Updates end date of a lesson
+     * @param endDate end date
+     */
+    public void setEndDate(String endDate) {
+<span class="fc" id="L154">        this.endDate = endDate;</span>
+<span class="fc" id="L155">    }</span>
+
+    /**
+     * gets price of a lesson
+     * @return lesson price
+     */
+    public double getPrice() {
+<span class="fc" id="L162">        return this.price;</span>
+    }
+
+    /**
+     * update the lesson price
+     * @param price new price of lesson
+     */
+    public void setPrice(double price) {
+<span class="fc" id="L170">        this.price = price;</span>
+<span class="fc" id="L171">    }</span>
+
+
+    @Override
+    public String toString() {
+<span class="fc" id="L176">        return &quot;{&quot; +</span>
+<span class="fc" id="L177">            &quot; id='&quot; + getId() + &quot;'&quot; +</span>
+<span class="fc" id="L178">            &quot;, username='&quot; + getUsername() + &quot;'&quot; +</span>
+<span class="fc" id="L179">            &quot;, title='&quot; + getTitle() + &quot;'&quot; +</span>
+<span class="fc" id="L180">            &quot;, description='&quot; + getDescription() + &quot;'&quot; +</span>
+<span class="fc" id="L181">            &quot;, days='&quot; + getDays() + &quot;'&quot; +</span>
+<span class="fc" id="L182">            &quot;, startDate='&quot; + getStartDate() + &quot;'&quot; +</span>
+<span class="fc" id="L183">            &quot;, endDate='&quot; + getEndDate() + &quot;'&quot; +</span>
+<span class="fc" id="L184">            &quot;, price='&quot; + getPrice() + &quot;'&quot; +</span>
+            &quot;}&quot;;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        if (!(o instanceof Lesson)) {</span>
+<span class="fc" id="L192">            return false;</span>
+        }
+<span class="fc" id="L194">        Lesson lesson = (Lesson) o;</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">        return id == lesson.id</span>
+<span class="pc bpc" id="L196" title="1 of 2 branches missed.">        &amp;&amp; Objects.equals(username, lesson.username)</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">        &amp;&amp; Objects.equals(title, lesson.title)</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">        &amp;&amp; Objects.equals(description, lesson.description)</span>
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">        &amp;&amp; Objects.equals(days, lesson.days)</span>
+<span class="pc bpc" id="L200" title="1 of 2 branches missed.">        &amp;&amp; Objects.equals(startDate, lesson.startDate)</span>
+<span class="pc bpc" id="L201" title="2 of 4 branches missed.">        &amp;&amp; Objects.equals(endDate, lesson.endDate)</span>
+        &amp;&amp; price == lesson.price;
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L207">        return Objects.hash(id, username, title, description, days, startDate, endDate, price);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

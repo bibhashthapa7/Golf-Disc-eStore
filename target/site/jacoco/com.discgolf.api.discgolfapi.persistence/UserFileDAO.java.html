@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserFileDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.persistence</a> &gt; <span class="el_source">UserFileDAO.java</span></div><h1>UserFileDAO.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.persistence;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.discgolf.api.discgolfapi.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+/**
+ * Implements the functionality for JSON file-based peristance for Usersget
+ * 
+ * {@literal @}Component Spring annotation instantiates a single instance of this
+ * class and injects the instance into other classes as needed
+ * 
+ * @author SWEN Faculty + coolname
+ */
+@Component
+public class UserFileDAO implements UserDAO {
+    Map&lt;Integer, User&gt; users;   // Provides a local cache of the user objects
+                                // so that we don't need to read from the file
+                                // each time
+    private ObjectMapper objectMapper;  // Provides conversion between User
+                                        // objects and JSON text format written
+                                        // to the file
+    private static int nextId;  // The next Id to assign to a new user
+    private String filename;    // Filename to read from and write to
+
+    /**
+     * Creates a User File Data Access Object
+     * 
+     * @param filename Filename to read from and write to
+     * @param objectMapper Provides JSON Object to/from Java Object serialization and deserialization
+     * 
+     * @throws IOException when file cannot be accessed or read from
+     */
+<span class="fc" id="L42">    public UserFileDAO(@Value(&quot;${users.file}&quot;) String filename,ObjectMapper objectMapper) throws IOException {</span>
+<span class="fc" id="L43">        this.filename = filename;</span>
+<span class="fc" id="L44">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L45">        load();  // load the users from the file</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * Generates the next id for a new {@linkplain User user}
+     * 
+     * @return The next id
+     */
+    private synchronized static int nextId() {
+<span class="fc" id="L54">        int id = nextId;</span>
+<span class="fc" id="L55">        ++nextId;</span>
+<span class="fc" id="L56">        return id;</span>
+    }
+
+    /**
+     * Generates an array of {@linkplain User users} from the tree map
+     * 
+     * @return The array of {@link User users}, may be empty
+     */
+    private User[] getUsersArray() {
+<span class="fc" id="L65">        return getUsersArray(null);</span>
+    }
+
+    /**
+     * Generates an array of {@linkplain User users} from the tree map for any
+     * {@linkplain User users} that contains the text specified by containsText
+     * &lt;br&gt;
+     * If username is null, the array contains all of the {@linkplain User users}
+     * in the tree map
+     * 
+     * @return The array of {@link User users}, may be empty
+     */
+    private User[] getUsersArray(String username) { // if username is null, no filter
+<span class="fc" id="L78">        ArrayList&lt;User&gt; userArrayList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        for (User user : users.values()) {</span>
+<span class="pc bpc" id="L81" title="3 of 4 branches missed.">            if (username == null || user.getUsername().contains(username)) {</span>
+<span class="fc" id="L82">                userArrayList.add(user);</span>
+            }
+<span class="fc" id="L84">        }</span>
+
+<span class="fc" id="L86">        User[] userArray = new User[userArrayList.size()];</span>
+<span class="fc" id="L87">        userArrayList.toArray(userArray);</span>
+<span class="fc" id="L88">        return userArray;</span>
+    }
+
+    /**
+     * Saves the {@linkplain User users} from the map into the file as an array of JSON objects
+     * 
+     * @return true if the {@link User users} were written successfully
+     * 
+     * @throws IOException when file cannot be accessed or written to
+     */
+    private boolean save() throws IOException {
+<span class="fc" id="L99">        User[] userArray = getUsersArray();</span>
+
+        // Serializes the Java Objects to JSON objects into the file
+        // writeValue will thrown an IOException if there is an issue
+        // with the file or reading from the file
+<span class="fc" id="L104">        objectMapper.writeValue(new File(filename),userArray);</span>
+<span class="fc" id="L105">        return true;</span>
+    }
+
+    /**
+     * Loads {@linkplain User users} from the JSON file into the map
+     * &lt;br&gt;
+     * Also sets next id to one more than the greatest id found in the file
+     * 
+     * @return true if the file was read successfully
+     * 
+     * @throws IOException when file cannot be accessed or read from
+     */
+    private boolean load() throws IOException {
+<span class="fc" id="L118">        users = new TreeMap&lt;&gt;();</span>
+<span class="fc" id="L119">        nextId = 0;</span>
+
+        // Deserializes the JSON objects from the file into an array of users
+        // readValue will throw an IOException if there's an issue with the file
+        // or reading from the file
+<span class="fc" id="L124">        User[] userArray = objectMapper.readValue(new File(filename),User[].class);</span>
+
+        // Add each user to the tree map and keep track of the greatest id
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        for (User user : userArray) {</span>
+<span class="fc" id="L128">            users.put(user.getId(), user);</span>
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">            if (user.getId() &gt; nextId)</span>
+<span class="fc" id="L130">                nextId = user.getId();</span>
+        }
+        // Make the next id one greater than the maximum from the file
+<span class="fc" id="L133">        ++nextId;</span>
+<span class="fc" id="L134">        return true;</span>
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public User[] getUsers() {
+<span class="fc" id="L142">        synchronized(users) {</span>
+<span class="fc" id="L143">            return getUsersArray();</span>
+        }
+    }
+
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public User getUser(int id) {
+<span class="fc" id="L153">        synchronized(users) {</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">            if (users.containsKey(id))</span>
+<span class="fc" id="L155">                return users.get(id);</span>
+            else
+<span class="fc" id="L157">                return null;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public User getUser(String username) {
+<span class="fc" id="L166">        synchronized(users) {</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">            for(User user : users.values()) {</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">                if(user.getUsername().equalsIgnoreCase(username)) {</span>
+<span class="fc" id="L169">                    return user;</span>
+                }
+<span class="fc" id="L171">            }</span>
+<span class="fc" id="L172">            return null;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public User createUser(User user) throws IOException {
+<span class="fc" id="L181">        synchronized(users) {</span>
+            // We create a new user object because the id field is immutable
+            // and we need to assign the next unique id
+            
+            // return null if a username is already taken
+<span class="fc bfc" id="L186" title="All 2 branches covered.">            for(User estUser : users.values()) {</span>
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">                if(estUser.getUsername().equalsIgnoreCase(user.getUsername())) {</span>
+<span class="nc" id="L188">                    return null;</span>
+                }
+<span class="fc" id="L190">            } </span>
+
+<span class="fc" id="L192">            User newUser = new User(nextId(), user.getUsername(), user.getPassword());</span>
+<span class="fc" id="L193">            users.put(newUser.getId(), newUser);</span>
+<span class="fc" id="L194">            save(); // may throw an IOException</span>
+<span class="fc" id="L195">            return newUser;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public User updateUser(User user) throws IOException {
+<span class="fc" id="L204">        synchronized(users) {</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">            if (users.containsKey(user.getId()) == false)</span>
+<span class="fc" id="L206">                return null;  // user does not exist</span>
+
+<span class="fc" id="L208">            users.put(user.getId(), user);</span>
+<span class="fc" id="L209">            save(); // may throw an IOException</span>
+<span class="fc" id="L210">            return user;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public boolean deleteUser(String username) throws IOException {
+<span class="fc" id="L219">        synchronized(users) {</span>
+
+<span class="fc bfc" id="L221" title="All 2 branches covered.">            for(User user : users.values()) {</span>
+<span class="fc bfc" id="L222" title="All 2 branches covered.">                if(user.getUsername().equalsIgnoreCase(username)) {</span>
+<span class="fc" id="L223">                    users.remove(user.getId());</span>
+<span class="fc" id="L224">                    return save();</span>
+                }
+<span class="fc" id="L226">            }</span>
+
+<span class="fc" id="L228">            return false;</span>
+        }
+    }
+
+    /**
+     * Method to delete a user based on a userId instead of a provided username
+     * @param id id
+     * @return boolean of whether it was successful or not.
+     * @throws IOException
+     */
+    public boolean deleteUser(int id) throws IOException {
+<span class="fc" id="L239">        synchronized(users) {</span>
+<span class="fc bfc" id="L240" title="All 2 branches covered.">            if (users.containsKey(id)) {</span>
+<span class="fc" id="L241">                users.remove(id);</span>
+<span class="fc" id="L242">                return save();</span>
+            }
+            else
+<span class="fc" id="L245">                return false;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

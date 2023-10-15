@@ -1,0 +1,51 @@
+<div class="container">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Color</th>
+                <th>Weight</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let product of products">
+                <td id="productId">{{product.id}}</td>
+                <td><input id="productColor{{product.id}}" value={{product.color}}></td>
+                <td><input type="number" id="productWeight{{product.id}}" value={{product.weight}}></td>
+                <td>
+                    <select class="select" id="productType{{product.id}}" [(ngModel)]="product.type">
+                        <option>Distance Driver</option>
+                        <option>Midrange</option>
+                        <option>Fairway Driver</option>
+                        <option>Putter</option>
+                    </select>
+                </td>
+                <td><input type="number" id="productPrice{{product.id}}" value={{product.price}}></td>
+                <td><input type="number" id="productQuantity{{product.id}}" value={{product.quantity}}></td>
+                <td><button class="btn" (click)="updateProduct(product.id)">Save</button></td>
+                <td><button class="btn" (click)="deleteProduct(product.id)">Delete</button></td>
+            </tr>
+            <tr>
+                <td>✎ New</td>
+                <td><input id="color" [(ngModel)]="productColor" placeholder="Color"></td>
+                <td><input type="number" id="weight" [(ngModel)]="productWeight" placeholder="Weight"></td>
+                <td>
+                    <select class="select" id="type" [(ngModel)]="productType" placeholder="Type">
+                        <option>Distance Driver</option>
+                        <option>Midrange</option>
+                        <option>Fairway Driver</option>
+                        <option>Putter</option>
+                    </select>
+                </td>
+                <td><input type="number" id="price" [(ngModel)]="productPrice" placeholder="Price"></td>
+                <td><input type="number" id="quantity" [(ngModel)]="productQuantity" placeholder="Quantity"></td>
+                <td><button class="btn" type="create" (click)="createProduct(productType,productQuantity,productPrice,productWeight,productColor)">Create</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

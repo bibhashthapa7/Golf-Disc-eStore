@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DiscController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.controller</a> &gt; <span class="el_source">DiscController.java</span></div><h1>DiscController.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.discgolf.api.discgolfapi.model.Disc;
+import com.discgolf.api.discgolfapi.persistence.DiscDAO;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Handles the REST API requests for the Disc resource
+ * &lt;p&gt;
+ * {@literal @}RestController Spring annotation identifies this class as a REST API
+ * method handler to the Spring framework
+ * 
+ * @author SWEN Faculty + coolname
+ */
+
+@RestController
+@RequestMapping(&quot;discs&quot;)
+public class DiscController {
+<span class="fc" id="L34">    private static final Logger LOG = Logger.getLogger(DiscController.class.getName());</span>
+    private DiscDAO discDao;
+
+    /**
+     * Creates a REST API controller to reponds to requests
+     * 
+     * @param discDao The {@link DiscDAO Disc Data Access Object} to perform CRUD operations
+     * &lt;br&gt;
+     * This dependency is injected by the Spring Framework
+     */
+<span class="fc" id="L44">    public DiscController(DiscDAO discDao) {</span>
+<span class="fc" id="L45">        this.discDao = discDao;</span>
+<span class="fc" id="L46">    }</span>
+
+    /**
+     * Responds to the GET request for a {@linkplain Disc disc} for the given id
+     * 
+     * @param id The id used to locate the {@link Disc disc}
+     * 
+     * @return ResponseEntity with {@link Disc disc} object and HTTP status of OK if found&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Disc&gt; getDisc(@PathVariable int id) {
+<span class="fc" id="L59">        LOG.info(&quot;GET /discs/&quot; + id);</span>
+        try {
+<span class="fc" id="L61">            Disc disc = discDao.getDisc(id);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            if (disc != null)</span>
+<span class="fc" id="L63">                return new ResponseEntity&lt;Disc&gt;(disc,HttpStatus.OK);</span>
+            else
+<span class="fc" id="L65">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L67">        catch(IOException e) {</span>
+<span class="fc" id="L68">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L69">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for all {@linkplain Disc discs}
+     * 
+     * @return ResponseEntity with array of {@link Disc disc} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;&quot;)
+    public ResponseEntity&lt;Disc[]&gt; getDiscs() {
+<span class="fc" id="L82">        LOG.info(&quot;GET /discs&quot;);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L86">            Disc[] discs = discDao.getDiscs();</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            if (discs != null)</span>
+<span class="fc" id="L88">                return new ResponseEntity&lt;Disc[]&gt;(discs, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L90">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L92">        catch(IOException e) {</span>
+<span class="fc" id="L93">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L94">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for all {@linkplain Disc discs} which has the same type
+     * 
+     * @param type The type parameter which contains the int_type used to find the {@link Disc discs}
+     * 
+     * @return ResponseEntity with array of {@link Disc disc} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     * &lt;p&gt;
+     * Example: Find all discs that have the type 1
+     * GET http://localhost:8080/discs/?type=1
+     */
+    @GetMapping(&quot;/&quot;)
+    public ResponseEntity&lt;Disc[]&gt; searchDiscs(@RequestParam String type) {
+<span class="fc" id="L112">        LOG.info(&quot;GET /discs/?type=&quot;+type);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L116">            Disc[] discs = discDao.findDiscs(type, 1);</span>
+<span class="fc bfc" id="L117" title="All 2 branches covered.">            if (discs != null)</span>
+<span class="fc" id="L118">                return new ResponseEntity&lt;Disc[]&gt;(discs, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L120">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L122">        catch(IOException e) {</span>
+<span class="fc" id="L123">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L124">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for all {@linkplain Disc discs} filtered by the given mode
+     * 
+     * @param search The type parameter which contains the int_type used to find the {@link Disc discs}
+     * @param mode The filter mode {0:All, 1:Type, 2:Color, 3:Weight, 4:Price, Default:Price}
+     * 
+     * @return ResponseEntity with array of {@link Disc disc} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     * &lt;p&gt;
+     */
+    @GetMapping(&quot;/filter&quot;)
+    public ResponseEntity&lt;Disc[]&gt; searchAndFilterDiscs(@RequestParam String search, @RequestParam int mode) {
+<span class="fc" id="L141">        LOG.info(&quot;GET /discs/?search=&quot; + search + &quot;, mode=&quot; + mode);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L145">            Disc[] discs = discDao.findDiscs(search, mode);</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            if (discs != null)</span>
+<span class="fc" id="L147">                return new ResponseEntity&lt;Disc[]&gt;(discs, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L149">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L151">        catch(IOException e) {</span>
+<span class="fc" id="L152">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L153">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Creates a {@linkplain Disc disc} with the provided disc object
+     * 
+     * @param disc - The {@link Disc disc} to create
+     * 
+     * @return ResponseEntity with created {@link Disc disc} object and HTTP status of CREATED&lt;br&gt;
+     * ResponseEntity with HTTP status of CONFLICT if {@link Disc disc} object already exists&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PostMapping(&quot;&quot;)
+    public ResponseEntity&lt;Disc&gt; createDisc(@RequestBody Disc disc) {
+<span class="fc" id="L168">        LOG.info(&quot;POST /discs &quot; + disc);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L172">            Disc newDisc = discDao.createDisc(disc);</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">            if (newDisc != null)</span>
+<span class="fc" id="L174">                return new ResponseEntity&lt;Disc&gt;(newDisc, HttpStatus.CREATED);</span>
+            else
+<span class="fc" id="L176">                return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
+        }
+<span class="fc" id="L178">        catch(IOException e) {</span>
+<span class="fc" id="L179">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L180">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Updates the {@linkplain Disc disc} with the provided {@linkplain Disc disc} object, if it exists
+     * 
+     * @param disc The {@link Disc disc} to update
+     * 
+     * @return ResponseEntity with updated {@link Disc disc} object and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;&quot;)
+    public ResponseEntity&lt;Disc&gt; updateDisc(@RequestBody Disc disc) {
+<span class="fc" id="L195">        LOG.info(&quot;PUT /discs &quot; + disc);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L199">            Disc updatedDisc = discDao.updateDisc(disc);</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">            if (updatedDisc != null)</span>
+<span class="fc" id="L201">                return new ResponseEntity&lt;Disc&gt;(updatedDisc, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L203">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L205">        catch(IOException e) {</span>
+<span class="fc" id="L206">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L207">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Deletes a {@linkplain Disc disc} with the given id
+     * 
+     * @param id The id of the {@link Disc disc} to deleted
+     * 
+     * @return ResponseEntity HTTP status of OK if deleted&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Disc&gt; deleteDisc(@PathVariable int id) {
+<span class="fc" id="L222">        LOG.info(&quot;DELETE /discs/&quot; + id);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L226">            boolean deleted = discDao.deleteDisc(id);</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">            if (deleted)</span>
+<span class="fc" id="L228">                return new ResponseEntity&lt;&gt;(HttpStatus.OK);</span>
+            else
+<span class="fc" id="L230">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L232">        catch(IOException e) {</span>
+<span class="fc" id="L233">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L234">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Cart.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.model</a> &gt; <span class="el_source">Cart.java</span></div><h1>Cart.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.model;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * Represents a Cart entity
+ * @author ZVH
+ */
+public class Cart {
+    private Map&lt;Integer, Integer&gt; contents;
+    private String username;
+    private int id;
+
+    /**
+    * Create a Cart with the given contents
+     * @param contents The contents of the cart: {int disc_id : int quantity} pairs
+     * 
+     * {@literal @}JsonProperty is used in serialization and deserialization
+     * of the JSON object to the Java object in mapping the fields.  If a field
+     * is not provided in the JSON object, the Java field gets the default Java
+     * value, i.e. 0 for int
+     */
+<span class="fc" id="L25">    public Cart(@JsonProperty(&quot;id&quot;) int id, @JsonProperty(&quot;username&quot;) String username, @JsonProperty(&quot;contents&quot;) HashMap&lt;Integer, Integer&gt; contents) {</span>
+<span class="fc" id="L26">        this.setContents(contents);</span>
+<span class="fc" id="L27">        this.username = username; // TODO Update to user_id</span>
+<span class="fc" id="L28">        this.id = id;</span>
+<span class="fc" id="L29">    }</span>
+
+    /**
+    * Create an empty Cart
+     * 
+     * {@literal @}JsonProperty is used in serialization and deserialization
+     * of the JSON object to the Java object in mapping the fields.  If a field
+     * is not provided in the JSON object, the Java field gets the default Java
+     * value, i.e. 0 for int
+     */
+    // public Cart(@JsonProperty(&quot;id&quot;) int id, @JsonProperty(&quot;username&quot;) String username) {
+    //     this(id, username, new HashMap&lt;&gt;());
+    // }
+
+    /**
+     * Get the associated Cart id
+     * @return The id of the Cart
+     */
+<span class="fc" id="L47">    public int getId() { return id; }</span>
+
+    /**
+     * Get the associated Cart owner's username
+     * @return The associated username
+     */
+<span class="fc" id="L53">    public String getUsername() { return username; }</span>
+
+    /**
+     * Get the contents of the Cart
+     * @return A deep-copy of contents {int disc_id : int quantity}
+     */
+    public HashMap&lt;Integer, Integer&gt; getContents() {
+<span class="fc" id="L60">        HashMap&lt;Integer, Integer&gt; copy = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        for (Integer key : contents.keySet())</span>
+<span class="fc" id="L62">            copy.put(key, contents.get(key));</span>
+
+<span class="fc" id="L64">        return copy;</span>
+    }
+
+    /**
+     * Get the quantity of a Disc in the Cart
+     * @param disc Disc in the Cart
+     * @return The quantity of the Disc
+     */
+    public int getQuantity(Disc disc) {
+<span class="fc" id="L73">        int disc_id = disc.getId();</span>
+<span class="fc" id="L74">        int quantity = 0;</span>
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (contents.containsKey(disc_id)) // Update or add disc</span>
+<span class="fc" id="L77">            quantity += contents.get(disc_id);</span>
+
+<span class="fc" id="L79">        return quantity;</span>
+    }
+
+    /**
+     * Sets the Cart owner's username
+     * @param username The username of the Cart owner
+     */
+<span class="fc" id="L86">    public void setUsername(String username) { this.username = username; }</span>
+
+    /**
+     * Sets the contents of the Cart
+     * @param contents The contents to set in the Cart
+     */
+    public void setContents(Map&lt;Integer, Integer&gt; contents) {
+<span class="fc" id="L93">        HashMap&lt;Integer, Integer&gt; newContents = new HashMap&lt;&gt;();</span>
+
+        try {
+<span class="fc bfc" id="L96" title="All 2 branches covered.">            for (Integer key : contents.keySet())</span>
+<span class="fc" id="L97">                newContents.put(key, contents.get(key));</span>
+<span class="fc" id="L98">            this.contents = newContents;</span>
+<span class="pc" id="L99">        } catch (Exception e) { /** Squash */ }</span>
+<span class="fc" id="L100">    }</span>
+
+    /**
+     * Adds the quantity of Discs to the Cart
+     * @param disc_id ID of the Disc added to the Cart
+     * @param quantity The number of Discs to add
+     * @return Pass/Fail
+     */
+    public boolean addDisc(int disc_id, int quantity) {
+<span class="fc" id="L109">        boolean result = false;</span>
+
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">        if (quantity &gt; 0) // Validate quantity</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">            if (contents.containsKey(disc_id)) // Update or add disc</span>
+<span class="nc" id="L113">                contents.replace(disc_id, contents.get(disc_id) + quantity);</span>
+            else
+<span class="fc" id="L115">                contents.put(disc_id, quantity);</span>
+<span class="fc" id="L116">            result = true;</span>
+<span class="fc" id="L117">        return result;</span>
+    }
+
+    /**
+     * Adds the Disc to the Cart
+     * @param disc_id ID of the Disc added to the Cart
+     * @return Pass/Fail
+     */
+    public boolean addDisc(int disc_id) {
+<span class="fc" id="L126">        return this.addDisc(disc_id, 1);</span>
+    }
+
+    /**
+     * Removes the Disc from the Cart
+     * @param disc_id ID of the Disc removed from the Cart
+     * @return Pass/Fail
+     */
+    public boolean removeDisc(int disc_id) {
+<span class="fc" id="L135">        boolean result = false;</span>
+
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        if (contents.containsKey(disc_id)) {</span>
+<span class="fc" id="L138">            contents.remove(disc_id);</span>
+<span class="fc" id="L139">            result = true;</span>
+<span class="fc" id="L140">        } return result;</span>
+    }
+
+    /**
+     * Updates the quantity of Disc in the Cart (removes if quantity &lt;= 0)
+     * @param disc_id ID of the Disc updated in the Cart
+     * @param quantity The number of Discs to set/add/sub
+     * @param mode {0:set, 1:add, 2:subtract} the quantity
+     * @return Pass/Fail
+     */
+    public boolean updateDiscQuantity(int disc_id, int quantity, int mode) {
+<span class="fc" id="L151">        boolean result = false;</span>
+
+<span class="pc bpc" id="L153" title="2 of 6 branches missed.">        if (contents.containsKey(disc_id) &amp;&amp; (mode &gt;= 0) &amp;&amp; (mode &lt;= 2)) { // Disc exists and Valid mode</span>
+<span class="fc bfc" id="L154" title="All 4 branches covered.">            quantity = (mode == 0 ? quantity : contents.get(disc_id) + (mode == 1 ? quantity : -quantity));</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            if (quantity &gt; 0) // Remove disc if quantity is invalid</span>
+<span class="fc" id="L156">                contents.replace(disc_id, quantity);</span>
+            else
+<span class="fc" id="L158">                removeDisc(disc_id);</span>
+<span class="fc" id="L159">            result = true;</span>
+<span class="fc" id="L160">        } return result;</span>
+    }
+
+    /**
+     * Updates the quantity of Disc in the Cart
+     * @param disc_id ID of the Disc updated in the Cart
+     * @param quantity The number of Discs to set
+     * @return Pass/Fail
+     */
+    public boolean updateDiscQuantity(int disc_id, int quantity) {
+<span class="fc" id="L170">        return this.updateDiscQuantity(disc_id, quantity, 0);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

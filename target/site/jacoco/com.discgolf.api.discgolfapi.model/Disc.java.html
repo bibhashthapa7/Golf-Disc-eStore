@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Disc.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.model</a> &gt; <span class="el_source">Disc.java</span></div><h1>Disc.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.model;
+
+import java.util.logging.Logger;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+/**
+ * Represents a Hero entity
+ * 
+ * @author SWEN Faculty + ZVH
+ */
+public class Disc {
+<span class="fc" id="L12">    private static final Logger LOG = Logger.getLogger(Disc.class.getName());</span>
+
+    // Package private for tests
+    public static final String STRING_FORMAT = &quot;Disc [id=%d, color=%s, weight=%d, type=%s, price=%g, quantity=%d]&quot;;
+
+    @JsonProperty(&quot;id&quot;) private int id;
+    @JsonProperty(&quot;color&quot;) private String color;
+    @JsonProperty(&quot;weight&quot;) private int weight;
+    @JsonProperty(&quot;type&quot;) private String type;
+    @JsonProperty(&quot;price&quot;) double price; 
+    @JsonProperty(&quot;quantity&quot;) int quantity;
+
+    /**
+     * Create a disc with the given id, color, weight, and type
+     * @param id The id of the disc
+     * @param color The color of the disc
+     * @param weight The weight of the disc
+     * @param type The type of the disc
+     * 
+     * {@literal @}JsonProperty is used in serialization and deserialization
+     * of the JSON object to the Java object in mapping the fields.  If a field
+     * is not provided in the JSON object, the Java field gets the default Java
+     * value, i.e. 0 for int
+     */
+    public Disc(@JsonProperty(&quot;id&quot;) int id, @JsonProperty(&quot;color&quot;) String color, 
+                @JsonProperty(&quot;weight&quot;) int weight, @JsonProperty(&quot;type&quot;) String type,
+<span class="fc" id="L38">                @JsonProperty(&quot;price&quot;) double price, @JsonProperty(&quot;quantity&quot;) int quantity) {</span>
+<span class="fc" id="L39">        this.id = id;</span>
+<span class="fc" id="L40">        this.color = color;</span>
+<span class="fc" id="L41">        this.weight = weight;</span>
+<span class="fc" id="L42">        this.type = type;</span>
+<span class="fc" id="L43">        this.price = price;</span>
+<span class="fc" id="L44">        this.quantity = quantity;</span>
+<span class="fc" id="L45">    }</span>
+
+    /**
+     * Retrieves the id of the disc
+     * @return The id of the disc
+     */
+<span class="fc" id="L51">    public int getId() {return id;}</span>
+
+    /**
+     * Sets the color of the disc - necessary for JSON object to Java object deserialization
+     * @param color The color of the disc
+     */
+<span class="fc" id="L57">    public void setColor(String color) {this.color = color;}</span>
+
+    /**
+     * Sets the weight of the disc - necessary for JSON object to Java object deserialization
+     * @param weight The weight of the disc
+     */
+<span class="fc" id="L63">    public void setWeight(int weight) {this.weight = weight;}</span>
+
+    /**
+     * Sets the type of the disc - necessary for JSON object to Java object deserialization
+     * @param type The type of the disc
+     */
+<span class="fc" id="L69">    public void setType(String type) {this.type = type;}</span>
+
+    /**
+     * Retrieves the color of the disc
+     * @return The color of the disc
+     */
+<span class="fc" id="L75">    public String getColor() {return this.color;}</span>
+
+    /**
+     * Retrieves the weight of the disc
+     * @return The weight of the disc
+     */
+<span class="fc" id="L81">    public int getWeight() {return this.weight;}</span>
+
+    /**
+     * Retrieves the type of the disc
+     * @return The type of the disc
+     */
+<span class="fc" id="L87">    public String getType() {return this.type;}</span>
+
+    /**
+     * retrieves the price of the disc
+     * @return price of disc
+     */
+<span class="fc" id="L93">    public double getPrice() { return this.price; }</span>
+
+    /**
+     * retrieves quantity of disc in inv
+     * @return quantity in inventory
+     */
+<span class="fc" id="L99">    public int getQuantity() { return this.quantity; }</span>
+
+    /**
+     * update the price of the disc
+     * @param price the new price of disc
+     */
+    public void setPrice(double price) {
+<span class="fc" id="L106">        this.price = price;</span>
+<span class="fc" id="L107">    }</span>
+
+    /**
+     * update the quantity of discs in inv
+     * @param quantity new quantity of discs in inv
+     */
+    public void setQuantity(int quantity) {
+<span class="fc" id="L114">        this.quantity = quantity;</span>
+<span class="fc" id="L115">    }</span>
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+<span class="fc" id="L122">        return String.format(STRING_FORMAT,id,color,weight,type,price,quantity);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

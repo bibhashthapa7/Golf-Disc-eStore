@@ -1,0 +1,53 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:300);
+
+.btn {
+    display: inline-block;
+    border-radius: 2px;
+    height: 30px;
+
+    text-decoration:none;
+    font-family:'Roboto',sans-serif;
+    font-size: 14px;
+    font-weight:400;
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #FFFFFF;
+    background-color: lightslategrey;
+    box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.10);
+  }
+
+.styled-table {
+    border-collapse: collapse;
+    font-size: 0.9em;
+    min-width: 300px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    background-color: white;
+
+    margin: 40px auto;
+    font-family:'Roboto',sans-serif;
+    color: lightslategrey;
+}
+.styled-table thead tr {
+    background-color: slateblue;
+    color: #ffffff;
+    text-align: left;
+}
+.styled-table th,
+.styled-table td {
+    padding: 10px 15px;
+}
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid slateblue;
+}
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: slateblue;
+}

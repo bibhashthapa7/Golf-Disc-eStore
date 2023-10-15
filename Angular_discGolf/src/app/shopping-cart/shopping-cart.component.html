@@ -1,0 +1,30 @@
+<div class="shopping-cart title" *ngIf="!canPurchase">Rather empty...</div>
+<div class="shopping-cart" *ngIf="canPurchase">
+    <!-- Title -->
+    <div class="title">Shopping Cart</div>
+    <div class="item" *ngFor="let product of products">
+        <img class="item_image" src={{getImagePath(product.color)}} />
+        <div class="description">
+            <span>{{product.type}} ${{product.price}}</span>
+            <span>Weight: {{product.weight}}</span>
+            <span>Color: {{product.color}}</span>
+        </div>
+        <!-- <input type="number" id="productQuantity{{product.id}}" value={{product.quantity}} style="width: 100px; text-align: center; outline: none;" (change)="updateProduct(product.id)"> -->
+        <div class="quantity" style="margin-left: auto;">
+            <button class="decrement" (click)="updateProduct(product.id, product.quantity-1)"> - </button>
+            <span>{{product.quantity}}</span>
+            <button class="increment" (click)="updateProduct(product.id, product.quantity+1)"> + </button>
+        </div>
+        <div class="description" style="margin-left: auto; margin-right: 25px;">
+            <button class="purchaseB" style="width: 100px;" (click)="purchaseOne(product.id)">Buy now</button>
+            <button class="purchaseB" style="width: 100px;" (click)="removeProduct(product.id)">Delete</button>
+        </div>
+    </div>
+    <div class="checkout" *ngIf="canPurchase">
+        <div class="description" style="margin-left: 30px">
+            <span style="margin-left: 0.1em; margin-top: 5px;">Items: {{count}}</span>
+            <span style="font-weight: bold; color: black">Total: ${{cost}}</span>
+            <button class="purchaseB" style="width: 210px;" (click)="purchaseCart()">Proceed to checkout</button>
+        </div>
+    </div>
+</div>

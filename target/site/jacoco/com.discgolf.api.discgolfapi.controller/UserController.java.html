@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.discgolf.api.discgolfapi.model.User;
+import com.discgolf.api.discgolfapi.persistence.UserDAO;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+@RestController
+@RequestMapping(&quot;users&quot;)
+public class UserController {
+<span class="fc" id="L25">    private static final Logger LOG = Logger.getLogger(UserController.class.getName());</span>
+    private UserDAO userDao;
+
+    /**
+     * Creates a REST API controller to reponds to requests
+     * 
+     * @param userDao The {@link UserDAO User Data Access Object} to perform CRUD operations
+     * &lt;br&gt;
+     * This dependency is injected by the Spring Framework
+     */
+<span class="fc" id="L35">    public UserController(UserDAO userDao) {</span>
+<span class="fc" id="L36">        this.userDao = userDao;</span>
+<span class="fc" id="L37">    }</span>
+
+    /**
+     * Responds to the GET request for a {@linkplain User user} for the given id
+     * 
+     * @param id The id used to locate the {@link User id}
+     * 
+     * @return ResponseEntity with {@link User user} object and HTTP status of OK if found&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;User&gt; getUser(@PathVariable int id) {
+<span class="fc" id="L50">        LOG.info(&quot;GET /users/&quot; + id);</span>
+        try {
+<span class="fc" id="L52">            User user = userDao.getUser(id);</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            if (user != null)</span>
+<span class="fc" id="L54">                return new ResponseEntity&lt;User&gt;(user, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L56">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+<span class="fc" id="L57">        } catch(IOException e) {</span>
+<span class="fc" id="L58">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L59">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for a {@linkplain User user} for the given username
+     * 
+     * @param username The username used to locate the {@link User user}
+     * 
+     * @return ResponseEntity with {@link User user} object and HTTP status of OK if found&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/{username}&quot;)
+    public ResponseEntity&lt;User&gt; getUser(@PathVariable String username) {
+<span class="fc" id="L74">        LOG.info(&quot;GET /users/&quot; + username);</span>
+        try {
+<span class="fc" id="L76">            User user = userDao.getUser(username);</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">            if (user != null)</span>
+<span class="fc" id="L78">                return new ResponseEntity&lt;User&gt;(user, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L80">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+<span class="fc" id="L81">        } catch(IOException e) {</span>
+<span class="fc" id="L82">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L83">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for all {@linkplain User users}
+     * 
+     * @return ResponseEntity with array of {@link User user} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;&quot;)
+    public ResponseEntity&lt;User[]&gt; getUsers() {
+<span class="fc" id="L96">        LOG.info(&quot;GET /users&quot;);</span>
+
+        try {
+<span class="fc" id="L99">            User[] users = userDao.getUsers();</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">            if (users != null)</span>
+<span class="fc" id="L101">                return new ResponseEntity&lt;User[]&gt;(users, HttpStatus.OK);</span>
+            else
+<span class="nc" id="L103">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L105">        catch(IOException e) {</span>
+<span class="fc" id="L106">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L107">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Creates a {@linkplain User user} with the provided user object
+     * 
+     * @param user - The {@link User user} to create
+     * 
+     * @return ResponseEntity with created {@link User user} object and HTTP status of CREATED&lt;br&gt;
+     * ResponseEntity with HTTP status of CONFLICT if {@link User user} object already exists&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PostMapping(&quot;&quot;)
+    public ResponseEntity&lt;User&gt; createUser(@RequestBody User user) {
+<span class="fc" id="L122">        LOG.info(&quot;POST /users &quot; + user);</span>
+
+        try {
+<span class="fc" id="L125">            User newUser = userDao.createUser(user);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            if (newUser != null)</span>
+<span class="fc" id="L127">                return new ResponseEntity&lt;User&gt;(newUser, HttpStatus.CREATED);</span>
+            else
+<span class="fc" id="L129">                return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
+        }
+<span class="fc" id="L131">        catch(IOException e) {</span>
+<span class="fc" id="L132">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L133">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Updates the {@linkplain User user} with the provided {@linkplain User user} object, if it exists
+     * 
+     * @param user The {@link User user} to update
+     * 
+     * @return ResponseEntity with updated {@link User user} object and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;&quot;)
+    public ResponseEntity&lt;User&gt; updateUser(@RequestBody User user) {
+<span class="fc" id="L148">        LOG.info(&quot;PUT /users &quot; + user);</span>
+
+        try {
+<span class="fc" id="L151">            User updatedUser = userDao.updateUser(user);</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">            if (updatedUser != null)</span>
+<span class="fc" id="L153">                return new ResponseEntity&lt;User&gt;(updatedUser, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L155">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L157">        catch(IOException e) {</span>
+<span class="fc" id="L158">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L159">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Deletes a {@linkplain User user} with the given id
+     * 
+     * @param id The id of the {@link User user} to deleted
+     * 
+     * @return ResponseEntity HTTP status of OK if deleted&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;User&gt; deleteUser(@PathVariable int id) {
+<span class="fc" id="L174">        LOG.info(&quot;DELETE /users/&quot; + id);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L178">            boolean deleted = userDao.deleteUser(id);</span>
+<span class="fc bfc" id="L179" title="All 2 branches covered.">            if (deleted)</span>
+<span class="fc" id="L180">                return new ResponseEntity&lt;&gt;(HttpStatus.OK);</span>
+            else
+<span class="fc" id="L182">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L184">        catch(IOException e) {</span>
+<span class="fc" id="L185">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L186">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }    
+
+    
+    /**
+     * Deletes a {@linkplain User user} with the given user
+     * 
+     * @param username The username of the {@link User username} to deleted
+     * 
+     * @return ResponseEntity HTTP status of OK if deleted&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @DeleteMapping(&quot;/{username}&quot;)
+    public ResponseEntity&lt;User&gt; deleteUser(@PathVariable String username) {
+<span class="fc" id="L202">        LOG.info(&quot;DELETE /users/&quot; + username);</span>
+
+        try {
+<span class="fc" id="L205">            boolean deleted = userDao.deleteUser(username);</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">            if (deleted)</span>
+<span class="fc" id="L207">                return new ResponseEntity&lt;&gt;(HttpStatus.OK);</span>
+            else
+<span class="fc" id="L209">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L211">        catch(IOException e) {</span>
+<span class="fc" id="L212">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L213">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }    
+
+    /**
+     * Responds to the GET login request for a {@linkplain User user} for the given username
+     * 
+     * @param username The username to be signed into
+     * @param password password associated with the user 
+     * 
+     * @return ResponseEntity with {@link User user} object and HTTP status of ACCEPTED if logged in&lt;br&gt;
+     * ResponseEntity with HTTP status of UNAUTHORIZED if login failed 
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/{username}/login/{password}&quot;)
+    public ResponseEntity&lt;User&gt; login(@PathVariable(&quot;username&quot;) String username,
+                                      @PathVariable(&quot;password&quot;) String password) {
+<span class="fc" id="L231">        LOG.info(&quot;GET /users/&quot; + username + &quot;/login/&quot; + password);</span>
+        try {
+<span class="fc" id="L233">            User user = userDao.getUser(username);</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">            if (user != null) {</span>
+<span class="fc" id="L235">                boolean response = user.login(password);</span>
+
+<span class="fc bfc" id="L237" title="All 2 branches covered.">                if(response) {</span>
+<span class="fc" id="L238">                    return new ResponseEntity&lt;User&gt;(user, HttpStatus.ACCEPTED);</span>
+                } else {
+<span class="fc" id="L240">                    return new ResponseEntity&lt;&gt;(HttpStatus.UNAUTHORIZED);</span>
+                }
+            } else {
+<span class="fc" id="L243">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+            }
+<span class="nc" id="L245">        } catch(IOException e) {</span>
+<span class="nc" id="L246">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="nc" id="L247">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+        /**
+     * Responds to the GET login request for a {@linkplain User user} for the given username
+     * 
+     * @param username The username to be signed into
+     * @param password password associated with the user 
+     * 
+     * @return ResponseEntity with HTTP status of OK if logged out in&lt;br&gt;
+     * ResponseEntity with HTTP status of UNAUTHORIZED if not logged in 
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/{username}/logout&quot;)
+    public ResponseEntity&lt;User&gt; logout(@PathVariable(&quot;username&quot;) String username) {
+<span class="fc" id="L264">        LOG.info(&quot;GET /users/&quot; + username + &quot;/logout&quot;);</span>
+        try {
+<span class="fc" id="L266">            User user = userDao.getUser(username);</span>
+<span class="fc bfc" id="L267" title="All 2 branches covered.">            if (user != null) {</span>
+<span class="fc" id="L268">                boolean response = user.logout();</span>
+
+<span class="fc bfc" id="L270" title="All 2 branches covered.">                if(response) {</span>
+<span class="fc" id="L271">                    return new ResponseEntity&lt;&gt;(HttpStatus.OK);</span>
+                } else {
+<span class="fc" id="L273">                    return new ResponseEntity&lt;&gt;(HttpStatus.UNAUTHORIZED);</span>
+                }
+            } else {
+<span class="fc" id="L276">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+            }
+<span class="nc" id="L278">        } catch(IOException e) {</span>
+<span class="nc" id="L279">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="nc" id="L280">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

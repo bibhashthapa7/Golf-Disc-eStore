@@ -1,0 +1,26 @@
+<div *ngIf="!canSeeLessons">Rather empty... you should subscribe to some coaching lessons...</div>
+<div *ngIf="canSeeLessons" class="container">
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Days</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Price</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let lesson of lessons">
+                <td>{{lesson.title}}</td>
+                <td>{{lesson.description}}</td>
+                <td>{{lesson.days}}</td>
+                <td>{{lesson.startDate}}</td>
+                <td>{{lesson.endDate}}</td>
+                <td>{{lesson.price}}</td>
+                <button class="btn" (click)="removeLesson(lesson)">Unsubscribe</button>
+            </tr>
+    </table>
+</div>

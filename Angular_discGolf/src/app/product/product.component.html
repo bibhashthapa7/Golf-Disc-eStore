@@ -1,0 +1,19 @@
+<!--
+    @author : Coolname + Bibhash Thapa + Nikhil Patil
+-->
+<div class="discs">
+    <!-- Title -->
+    <div class="title">Discs</div>
+    <div class="item" *ngFor="let product of products">
+        <img class="item_image" src={{getImagePath(product.color)}} />
+        <div class="description">
+            <span>{{product.type}} ${{product.price}}</span>
+            <span class = "weight">Weight: {{product.weight}}g</span>
+            <span>Color: {{product.color}}</span>
+        </div>
+        <div class="description" style="margin: 0px; margin-left: auto;">
+            <button class="purchaseB" (click)="viewDetails(product.id)">View Details</button>
+            <button class="purchaseB" *ngIf="canPurchase()" (click)="addToCart(product.id)">Add to Cart</button>
+        </div>
+    </div>
+</div>

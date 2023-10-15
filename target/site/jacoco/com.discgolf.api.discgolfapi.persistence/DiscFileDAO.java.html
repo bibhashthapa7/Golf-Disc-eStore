@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DiscFileDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.persistence</a> &gt; <span class="el_source">DiscFileDAO.java</span></div><h1>DiscFileDAO.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.persistence;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.logging.Logger;
+
+import com.discgolf.api.discgolfapi.model.Disc;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+/**
+ * Implements the functionality for JSON file-based peristance for Discs
+ * 
+ * {@literal @}Component Spring annotation instantiates a single instance of this
+ * class and injects the instance into other classes as needed
+ * 
+ * @author SWEN Faculty + coolname
+ */
+@Component
+public class DiscFileDAO implements DiscDAO {
+<span class="fc" id="L26">    private static final Logger LOG = Logger.getLogger(DiscFileDAO.class.getName());</span>
+    Map&lt;Integer,Disc&gt; discs;   // Provides a local cache of the disc objects
+                                // so that we don't need to read from the file
+                                // each time
+    private ObjectMapper objectMapper;  // Provides conversion between Disc
+                                        // objects and JSON text format written
+                                        // to the file
+    private static int nextId;  // The next Id to assign to a new disc
+    private String filename;    // Filename to read from and write to
+
+    /**
+     * Creates a Disc File Data Access Object
+     * 
+     * @param filename Filename to read from and write to
+     * @param objectMapper Provides JSON Object to/from Java Object serialization and deserialization
+     * 
+     * @throws IOException when file cannot be accessed or read from
+     */
+<span class="fc" id="L44">    public DiscFileDAO(@Value(&quot;${discs.file}&quot;) String filename,ObjectMapper objectMapper) throws IOException {</span>
+<span class="fc" id="L45">        this.filename = filename;</span>
+<span class="fc" id="L46">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L47">        load();  // load the discs from the file</span>
+<span class="fc" id="L48">    }</span>
+
+    /**
+     * Generates the next id for a new {@linkplain Disc disc}
+     * 
+     * @return The next id
+     */
+    private synchronized static int nextId() {
+<span class="fc" id="L56">        int id = nextId;</span>
+<span class="fc" id="L57">        ++nextId;</span>
+<span class="fc" id="L58">        return id;</span>
+    }
+
+    /**
+     * Generates an array of {@linkplain Disc discs} from the tree map
+     * 
+     * @return  The array of {@link Disc discs}, may be empty
+     */
+    private Disc[] getDiscsArray() {
+<span class="fc" id="L67">        return getDiscsArray(null, 0);</span>
+    }
+
+    /**
+     * Generates an array of {@linkplain Disc discs} from the tree map FILTERING using the mode
+     * 
+     * @param search The given term to search disc attributes for
+     * @param mode The filter mode {0:All, 1:Type, 2:Color, 3:Weight, 4:Price, Default:Price}
+     * @return  The array of {@link Disc discs}, may be empty
+     */
+    private Disc[] getDiscsArray(String search, int mode) {
+<span class="fc" id="L78">        ArrayList&lt;Disc&gt; discArrayList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        for (Disc disc : discs.values()) {</span>
+<span class="pc bpc" id="L81" title="1 of 4 branches missed.">            if (search == null || mode == 0) {</span>
+<span class="fc" id="L82">                discArrayList.add(disc); // Default add all</span>
+            } else {
+<span class="pc bpc" id="L84" title="5 of 6 branches missed.">                String discAttr = (mode == 1 ? disc.getType() : (mode == 2 ? disc.getColor() : (mode == 3 ? Integer.toString(disc.getWeight()) : Double.toString(disc.getPrice()))));</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">                if (discAttr.toLowerCase().contains(search.toLowerCase()))</span>
+<span class="fc" id="L86">                    discArrayList.add(disc);</span>
+            }
+<span class="fc" id="L88">        }</span>
+
+<span class="fc" id="L90">        Disc[] discArray = new Disc[discArrayList.size()];</span>
+<span class="fc" id="L91">        discArrayList.toArray(discArray);</span>
+<span class="fc" id="L92">        return discArray;</span>
+    }
+
+    /**
+     * Saves the {@linkplain Disc discs} from the map into the file as an array of JSON objects
+     * 
+     * @return true if the {@link Disc discs} were written successfully
+     * 
+     * @throws IOException when file cannot be accessed or written to
+     */
+    private boolean save() throws IOException {
+<span class="fc" id="L103">        Disc[] discArray = getDiscsArray();</span>
+
+        // Serializes the Java Objects to JSON objects into the file
+        // writeValue will thrown an IOException if there is an issue
+        // with the file or reading from the file
+<span class="fc" id="L108">        objectMapper.writeValue(new File(filename),discArray);</span>
+<span class="fc" id="L109">        return true;</span>
+    }
+
+    /**
+     * Loads {@linkplain Disc discs} from the JSON file into the map
+     * &lt;br&gt;
+     * Also sets next id to one more than the greatest id found in the file
+     * 
+     * @return true if the file was read successfully
+     * 
+     * @throws IOException when file cannot be accessed or read from
+     */
+    private boolean load() throws IOException {
+<span class="fc" id="L122">        discs = new TreeMap&lt;&gt;();</span>
+<span class="fc" id="L123">        nextId = 0;</span>
+
+        // Deserializes the JSON objects from the file into an array of discs
+        // readValue will throw an IOException if there's an issue with the file
+        // or reading from the file
+<span class="fc" id="L128">        Disc[] discArray = objectMapper.readValue(new File(filename),Disc[].class);</span>
+
+        // Add each disc to the tree map and keep track of the greatest id
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        for (Disc disc : discArray) {</span>
+<span class="fc" id="L132">            discs.put(disc.getId(),disc);</span>
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">            if (disc.getId() &gt; nextId)</span>
+<span class="fc" id="L134">                nextId = disc.getId();</span>
+        }
+        // Make the next id one greater than the maximum from the file
+<span class="fc" id="L137">        ++nextId;</span>
+<span class="fc" id="L138">        return true;</span>
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Disc[] getDiscs() {
+<span class="fc" id="L146">        synchronized(discs) {</span>
+<span class="fc" id="L147">            return getDiscsArray();</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override  
+    public Disc[] findDiscs(String search, int mode) {
+<span class="fc" id="L156">        synchronized(discs) {</span>
+<span class="fc" id="L157">            return getDiscsArray(search, mode);</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Disc getDisc(int id) {
+<span class="fc" id="L166">        synchronized(discs) {</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">            if (discs.containsKey(id))</span>
+<span class="fc" id="L168">                return discs.get(id);</span>
+            else
+<span class="fc" id="L170">                return null;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Disc createDisc(Disc disc) throws IOException {
+<span class="fc" id="L179">        synchronized(discs) {</span>
+            // We create a new disc object because the id field is immutable
+            // and we need to assign the next unique id
+<span class="fc" id="L182">            Disc newDisc = new Disc(nextId(), disc.getColor(),</span>
+<span class="fc" id="L183">                                    disc.getWeight(), disc.getType(), </span>
+<span class="fc" id="L184">                                    disc.getPrice(), disc.getQuantity());</span>
+<span class="fc" id="L185">            discs.put(newDisc.getId(),newDisc);</span>
+<span class="fc" id="L186">            save(); // may throw an IOException</span>
+<span class="fc" id="L187">            return newDisc;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Disc updateDisc(Disc disc) throws IOException {
+<span class="fc" id="L196">        synchronized(discs) {</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">            if (discs.containsKey(disc.getId()) == false)</span>
+<span class="fc" id="L198">                return null;  // disc does not exist</span>
+
+<span class="fc" id="L200">            discs.put(disc.getId(),disc);</span>
+<span class="fc" id="L201">            save(); // may throw an IOException</span>
+<span class="fc" id="L202">            return disc;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public boolean deleteDisc(int id) throws IOException {
+<span class="fc" id="L211">        synchronized(discs) {</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">            if (discs.containsKey(id)) {</span>
+<span class="fc" id="L213">                discs.remove(id);</span>
+<span class="fc" id="L214">                return save();</span>
+            }
+            else
+<span class="fc" id="L217">                return false;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

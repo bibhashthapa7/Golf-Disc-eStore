@@ -1,0 +1,22 @@
+<div class = "title">
+    <img src= "../assets/acadia_logo.png" alt="Acadia Logo" class = "logo_img">
+    <h1>Acadia<br/>Disc Golf</h1>
+    <app-product-search class = "search-bar" style="position: absolute; top: 45px; left: 0; right: 0; margin-left: auto; margin-right: auto; text-align: center;"></app-product-search>
+    <div class = "header-nav">
+        <a routerLink="/login" title="Login & Sign Up page">{{isLoggedIn() ? "Logout" : "Login"}}</a>
+        <a *ngIf="canSeeStuff()" routerLink="/cart" title="Shopping Cart">Cart</a>
+        <a *ngIf="canSeeStuff()" routerLink="/mylessons">Schedule</a>
+    </div>
+</div>
+<div class="topnav">
+    <ul>
+        <li><a routerLink="/home" title="Home page">Home</a></li>
+        <li><a routerLink="/products" title="Products page">Products</a></li>
+        <li><a routerLink="/lessons" title="Lessons page">Lessons</a></li>
+        <span *ngIf="isAdmin()">
+            <li><a routerLink="/inventory">✎ Products</a></li>
+            <li><a routerLink="/viewlessons">✎ Lessons</a></li>
+        </span>
+    </ul>
+</div>
+<router-outlet></router-outlet>

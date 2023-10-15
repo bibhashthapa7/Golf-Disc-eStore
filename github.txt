@@ -1,0 +1,49 @@
+commit 48e7ca06f5ce885f642042a29ff7b9d512de23da
+Author: ams1590 <98555715+ams1590@users.noreply.github.com>
+Date:   Mon Sep 19 22:48:26 2022 -0400
+
+    update name
+
+commit 62e6f4f5ccbc1875b65ec6dfb4bd56a56a4f48e3
+Author: nsp4746 <nsp4746@rit.edu>
+Date:   Mon Sep 19 22:29:41 2022 -0400
+
+    Added My Name
+
+commit 8bf23953aa58f29ad77a11093cf164a231b02f72
+Author: bibhashthapa7 <61898420+bibhashthapa7@users.noreply.github.com>
+Date:   Mon Sep 19 22:26:07 2022 -0400
+
+    Re-adding name - Bibhash
+
+commit 7457fd8c87f4cc6fcd53827451d7d60853eba486
+Author: bibhashthapa7 <61898420+bibhashthapa7@users.noreply.github.com>
+Date:   Mon Sep 19 22:25:21 2022 -0400
+
+    Update README.md
+    
+    Re-adding name! - Bibhash
+
+commit c4973e566578b938975fd12e6844a64faf2a57db
+Author: bibhashthapa7 <61898420+bibhashthapa7@users.noreply.github.com>
+Date:   Mon Sep 19 22:24:53 2022 -0400
+
+    Removing name
+
+commit 84c4fef307b94ae666ff13ddd44a9f1957a47a50
+Author: Zach <79552204+ZythiQ@users.noreply.github.com>
+Date:   Mon Sep 19 22:03:28 2022 -0400
+
+    extended name ¯\_(ツ)_/¯
+
+commit a5873215b0872bbd227f016bdf24262b17e9b563
+Author: namewastxken <89348222+namewastxken@users.noreply.github.com>
+Date:   Mon Sep 19 18:20:49 2022 -0400
+
+    added member names
+
+commit 5e2c351c107ca424b690c7428bf7a35800a980e6
+Author: github-classroom[bot] <66690702+github-classroom[bot]@users.noreply.github.com>
+Date:   Mon Sep 19 22:17:36 2022 +0000
+
+    Initial commit

@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CartController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.controller</a> &gt; <span class="el_source">CartController.java</span></div><h1>CartController.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.controller;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.discgolf.api.discgolfapi.model.Cart;
+import com.discgolf.api.discgolfapi.model.Disc;
+import com.discgolf.api.discgolfapi.persistence.CartDAO;
+import com.discgolf.api.discgolfapi.persistence.DiscDAO;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * Handles the REST API requests for the Cart resource
+ * &lt;p&gt;
+ * {@literal @}RestController Spring annotation identifies this class as a REST API
+ * method handler to the Spring framework
+ * 
+ * @author ZVH
+ */
+@RestController
+@RequestMapping(&quot;carts&quot;)
+public class CartController {
+<span class="fc" id="L38">    private static final Logger LOG = Logger.getLogger(CartController.class.getName());</span>
+    private CartDAO cartDao;
+    private DiscDAO discDao;
+
+    /**
+     * Creates a REST API controller to reponds to requests
+     * 
+     * @param cartDao The {@link CartDAO Cart Data Access Object} to perform CRUD operations
+     * @param discDao The {@link DiscDAO Disc Data Access Object} to perform CRUD operations
+     * &lt;br&gt;
+     * This dependency is injected by the Spring Framework
+     */
+<span class="fc" id="L50">    public CartController(CartDAO cartDao, DiscDAO discDao) {</span>
+<span class="fc" id="L51">        this.cartDao = cartDao;</span>
+<span class="fc" id="L52">        this.discDao = discDao;</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * Responds to the GET request for a {@linkplain Cart cart} for the given id
+     * 
+     * @param id The id used to locate the {@link Cart cart}
+     * 
+     * @return ResponseEntity with {@link Cart cart} object and HTTP status of OK if found&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Cart&gt; getCart(@PathVariable int id) {
+<span class="fc" id="L66">        LOG.info(&quot;GET /carts/&quot; + id);</span>
+        try {
+<span class="fc" id="L68">            Cart cart = cartDao.getCart(id);</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            if (cart != null)</span>
+<span class="fc" id="L70">                return new ResponseEntity&lt;Cart&gt;(cart,HttpStatus.OK);</span>
+            else
+<span class="fc" id="L72">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L74">        catch(IOException e) {</span>
+<span class="fc" id="L75">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L76">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for all {@linkplain Cart carts}
+     * 
+     * @return ResponseEntity with array of {@link Cart cart} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;&quot;)
+    public ResponseEntity&lt;Cart[]&gt; getCarts() {
+<span class="fc" id="L89">        LOG.info(&quot;GET /carts&quot;);</span>
+        try {
+<span class="fc" id="L91">            Cart[] carts = cartDao.getCarts();</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            if (carts != null)</span>
+<span class="fc" id="L93">                return new ResponseEntity&lt;Cart[]&gt;(carts, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L95">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L97">        catch(IOException e) {</span>
+<span class="fc" id="L98">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L99">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Responds to the GET request for all {@linkplain Cart carts} which has the same type
+     * 
+     * @param username The username parameter which contains the str_type used to find the {@link Cart carts}
+     * 
+     * @return ResponseEntity with array of {@link Cart cart} objects (may be empty) and
+     * HTTP status of OK&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     * &lt;p&gt;
+     * Example: Find all carts that have the username
+     * GET http://localhost:8080/carts/?username=&quot;john_doe&quot;
+     */
+    @GetMapping(&quot;/&quot;)
+    public ResponseEntity&lt;Cart[]&gt; searchCarts(@RequestParam String username) {
+<span class="fc" id="L117">        LOG.info(&quot;GET /carts/?username=&quot; + username);</span>
+        try {
+<span class="fc" id="L119">            Cart[] carts = cartDao.findCarts(username);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">            if (carts != null)</span>
+<span class="fc" id="L121">                return new ResponseEntity&lt;Cart[]&gt;(carts, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L123">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L125">        catch(IOException e) {</span>
+<span class="fc" id="L126">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L127">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @GetMapping(&quot;/{username}/contents&quot;)
+    public ResponseEntity&lt;Disc[]&gt; getContents(@PathVariable String username) {
+<span class="fc" id="L133">        LOG.info(&quot;GET /carts/&quot; + username + &quot;/contents&quot;);</span>
+        try {
+<span class="fc" id="L135">            Cart cart = cartDao.findCart(username);</span>
+<span class="fc" id="L136">            ArrayList&lt;Disc&gt; discs = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L138" title="All 2 branches covered.">            if (cart != null) {</span>
+<span class="fc" id="L139">                Map&lt;Integer, Integer&gt; contents = cart.getContents();</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">                for (int disc_id : contents.keySet()) {</span>
+<span class="fc" id="L141">                    Disc disc = discDao.getDisc(disc_id);</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">                    if (disc != null) // Give cart quantity not inventory's</span>
+<span class="fc" id="L143">                        discs.add(new Disc(disc_id, disc.getColor(), disc.getWeight(), disc.getType(), disc.getPrice(), contents.get(disc_id)));</span>
+<span class="fc" id="L144">                }</span>
+
+<span class="fc" id="L146">                Disc[] discArray = new Disc[discs.size()];</span>
+<span class="fc" id="L147">                discs.toArray(discArray);</span>
+
+<span class="fc" id="L149">                return new ResponseEntity&lt;Disc[]&gt;(discArray, HttpStatus.OK);</span>
+<span class="fc" id="L150">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L152">        catch(IOException e) {</span>
+<span class="fc" id="L153">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L154">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Creates a {@linkplain Cart cart} with the provided cart object
+     * 
+     * @param username - The username associated with the {@link Cart cart} to create
+     * 
+     * @return ResponseEntity with created {@link Cart cart} object and HTTP status of CREATED&lt;br&gt;
+     * ResponseEntity with HTTP status of CONFLICT if {@link Cart cart} object already exists&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PostMapping(&quot;&quot;)
+    public ResponseEntity&lt;Cart&gt; createCart(@RequestBody String username) {
+<span class="fc" id="L169">        LOG.info(&quot;POST /carts &quot; + username);</span>
+        try {
+<span class="fc" id="L171">            Cart newCart = cartDao.createCart(username);</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">            if (newCart != null)</span>
+<span class="fc" id="L173">                return new ResponseEntity&lt;Cart&gt;(newCart, HttpStatus.CREATED);</span>
+            else
+<span class="fc" id="L175">                return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
+        }
+<span class="fc" id="L177">        catch(IOException e) {</span>
+<span class="fc" id="L178">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L179">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Updates the {@linkplain Cart cart} with the provided {@linkplain Cart cart} object, if it exists
+     * 
+     * @param cart The {@link Cart cart} to update
+     * 
+     * @return ResponseEntity with updated {@link Cart cart} object and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;&quot;)
+    public ResponseEntity&lt;Cart&gt; updateCart(@RequestBody Cart cart) {
+<span class="fc" id="L194">        LOG.info(&quot;PUT /carts &quot; + cart);</span>
+        try {
+<span class="fc" id="L196">            Cart updatedCart = cartDao.updateCart(cart);</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">            if (updatedCart != null)</span>
+<span class="fc" id="L198">                return new ResponseEntity&lt;Cart&gt;(updatedCart, HttpStatus.OK);</span>
+            else
+<span class="fc" id="L200">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L202">        catch(IOException e) {</span>
+<span class="fc" id="L203">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L204">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Deletes a {@linkplain Cart cart} with the given id
+     * 
+     * @param id The id of the {@link Cart cart} to deleted
+     * 
+     * @return ResponseEntity HTTP status of OK if deleted&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Cart&gt; deleteCart(@PathVariable int id) {
+<span class="fc" id="L219">        LOG.info(&quot;DELETE /carts/&quot; + id);</span>
+
+        // Replace below with &quot;your&quot; implementation
+        try {
+<span class="fc" id="L223">            boolean deleted = cartDao.deleteCart(id);</span>
+<span class="fc bfc" id="L224" title="All 2 branches covered.">            if (deleted)</span>
+<span class="fc" id="L225">                return new ResponseEntity&lt;&gt;(HttpStatus.OK);</span>
+            else
+<span class="fc" id="L227">                return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L229">        catch(IOException e) {</span>
+<span class="fc" id="L230">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L231">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Adds a {@linkplain Disc disc} to the {@linkplain Cart cart} with the provided {@linkplain Cart cart} and {@linkplain Disc disc} objects, if they exist
+     * 
+     * @param cart_username The username associated with the {@link Cart cart} to update
+     * @param disc_id The ID of the {@linkplain Disc disc} to add to the {@link Cart cart}
+     * 
+     * @return ResponseEntity with updated {@link Cart cart} object and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;/addDisc/{cart_username}/{disc_id}&quot;)
+    public ResponseEntity&lt;Cart&gt; addToCart(@PathVariable String cart_username, @PathVariable int disc_id) {
+<span class="fc" id="L247">        LOG.info(&quot;PUT /carts/addDisc &quot; + cart_username + &quot; +&quot; + disc_id);</span>
+        try {
+<span class="fc" id="L249">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">            if (cart != null) {</span>
+<span class="fc" id="L251">                boolean result = cart.addDisc(disc_id);</span>
+<span class="fc bfc" id="L252" title="All 2 branches covered.">                if (result) { // ensure disc was added to cart</span>
+<span class="fc" id="L253">                    Cart updatedCart = cartDao.updateCart(cart);</span>
+<span class="pc bpc" id="L254" title="1 of 2 branches missed.">                    if (updatedCart != null)</span>
+<span class="fc" id="L255">                        return new ResponseEntity&lt;Cart&gt;(updatedCart, HttpStatus.OK);</span>
+                } 
+<span class="fc" id="L257">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L259">        catch(IOException e) {</span>
+<span class="fc" id="L260">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L261">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Removes a {@linkplain Disc disc} from the {@linkplain Cart cart} with the provided {@linkplain Cart cart} and {@linkplain Disc disc} objects, if they exist
+     * 
+     * @param cart_username The username associated with the {@link Cart cart} to update
+     * @param disc_id The ID of the {@linkplain Disc disc} to add to the {@link Cart cart}
+     * 
+     * @return ResponseEntity with updated {@link Cart cart} object and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;/removeDisc/{cart_username}/{disc_id}&quot;)
+    public ResponseEntity&lt;Cart&gt; removeFromCart(@PathVariable String cart_username, @PathVariable int disc_id) {
+<span class="fc" id="L277">        LOG.info(&quot;PUT /carts/removeDisc/&quot; + cart_username + &quot;/&quot; + disc_id);</span>
+        try {
+<span class="fc" id="L279">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="pc bpc" id="L280" title="1 of 2 branches missed.">            if (cart != null) {</span>
+<span class="fc" id="L281">                boolean result = cart.removeDisc(disc_id);</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">                if (result) { // ensure disc was added to cart</span>
+<span class="fc" id="L283">                    Cart updatedCart = cartDao.updateCart(cart);</span>
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">                    if (updatedCart != null)</span>
+<span class="fc" id="L285">                        return new ResponseEntity&lt;Cart&gt;(updatedCart, HttpStatus.OK);</span>
+                }
+<span class="fc" id="L287">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L289">        catch(IOException e) {</span>
+<span class="fc" id="L290">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L291">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Updates the quantity of a {@linkplain Disc disc} in the {@linkplain Cart cart} with the provided {@linkplain Cart cart} and {@linkplain Disc disc} objects, if they exist
+     * 
+     * @param cart_username The username associated with the {@link Cart cart} to update
+     * @param disc_id The ID of the {@linkplain Disc disc} to add to the {@link Cart cart}
+     * @param amount The amount to set/add/sub the {@linkplain Disc disc} quantity in the {@link Cart cart}
+     * @param mode {0:set, 1:add, 2:subtract} the quantity
+     * 
+     * @return ResponseEntity with updated {@link Cart cart} object and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;/updateDiscQuantity/{cart_username}/{disc_id}/{amount}/{mode}&quot;)
+    public ResponseEntity&lt;Cart&gt; updateQuantityInCart(@PathVariable String cart_username, @PathVariable int disc_id, @PathVariable int amount, @PathVariable int mode) {
+<span class="fc" id="L309">        LOG.info(&quot;PUT /carts/updateDiscQuantity/&quot; + cart_username + &quot;/&quot; + disc_id + &quot;/&quot; + amount + &quot;/&quot; + mode);</span>
+        try {
+<span class="fc" id="L311">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="pc bpc" id="L312" title="1 of 2 branches missed.">            if (cart != null) {</span>
+<span class="fc" id="L313">                boolean result = cart.updateDiscQuantity(disc_id, amount, mode);</span>
+
+<span class="fc bfc" id="L315" title="All 2 branches covered.">                if (result) { // ensure disc was updated in cart</span>
+<span class="fc" id="L316">                    Cart updatedCart = cartDao.updateCart(cart);</span>
+<span class="pc bpc" id="L317" title="1 of 2 branches missed.">                    if (updatedCart != null)</span>
+<span class="fc" id="L318">                        return new ResponseEntity&lt;Cart&gt;(updatedCart, HttpStatus.OK);</span>
+                }
+<span class="fc" id="L320">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L322">        catch(IOException e) {</span>
+<span class="fc" id="L323">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L324">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Gets the total cost of {@linkplain Disc disc's} in the {@linkplain Cart cart} with the provided cart_username
+     * 
+     * @param cart_username The username associated with the {@link Cart cart}
+     * 
+     * @return ResponseEntity with {@link Float cost} and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/getCost/{cart_username}&quot;)
+    public ResponseEntity&lt;Float&gt; getCost(@PathVariable String cart_username) {
+<span class="fc" id="L339">        LOG.info(&quot;PUT /carts/getCost/&quot; + cart_username);</span>
+        try {
+<span class="fc" id="L341">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="fc bfc" id="L342" title="All 2 branches covered.">            if (cart != null) {</span>
+<span class="fc" id="L343">                HashMap&lt;Integer, Integer&gt; contents = cart.getContents();</span>
+<span class="fc" id="L344">                float cost = 0.0f;</span>
+
+<span class="pc bpc" id="L346" title="2 of 4 branches missed.">                if (contents != null &amp;&amp; contents.size() &gt; 0) {</span>
+<span class="fc bfc" id="L347" title="All 2 branches covered.">                    for (int disc_id : contents.keySet()) {</span>
+<span class="fc" id="L348">                        Disc disc = discDao.getDisc(disc_id);</span>
+<span class="pc bpc" id="L349" title="1 of 2 branches missed.">                        if (disc != null)</span>
+<span class="fc" id="L350">                            cost += disc.getPrice() * contents.get(disc_id);</span>
+<span class="fc" id="L351">                    }</span>
+<span class="fc" id="L352">                } return new ResponseEntity&lt;Float&gt;(cost, HttpStatus.OK);</span>
+
+<span class="fc" id="L354">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L356">        catch(IOException e) {</span>
+<span class="fc" id="L357">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L358">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Gets the total count of {@linkplain Disc disc's} in the {@linkplain Cart cart} with the provided cart_username
+     * 
+     * @param cart_username The username associated with the {@link Cart cart}
+     * 
+     * @return ResponseEntity with {@link Integer count} and HTTP status of OK if updated&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/getCount/{cart_username}&quot;)
+    public ResponseEntity&lt;Integer&gt; getCount(@PathVariable String cart_username) {
+<span class="fc" id="L373">        LOG.info(&quot;PUT /carts/getCount/&quot; + cart_username);</span>
+        try {
+<span class="fc" id="L375">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="fc bfc" id="L376" title="All 2 branches covered.">            if (cart != null) {</span>
+<span class="fc" id="L377">                HashMap&lt;Integer, Integer&gt; contents = cart.getContents();</span>
+<span class="fc" id="L378">                int count = 0;</span>
+
+<span class="pc bpc" id="L380" title="2 of 4 branches missed.">                if (contents != null &amp;&amp; contents.size() &gt; 0) {</span>
+<span class="fc bfc" id="L381" title="All 2 branches covered.">                    for (int quantity : contents.values())</span>
+<span class="fc" id="L382">                        count += quantity;</span>
+
+<span class="fc" id="L384">                } return new ResponseEntity&lt;Integer&gt;(count, HttpStatus.OK);</span>
+
+<span class="fc" id="L386">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L388">        catch(IOException e) {</span>
+<span class="fc" id="L389">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L390">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Checks for conflicts in the {@linkplain Cart cart} with the provided cart_username
+     * 
+     * @param cart_username The username associated with the {@link Cart cart}
+     * 
+     * @return ResponseEntity with purchases {@link Cart cart} object and HTTP status of OK if discs could be purchased&lt;br&gt;
+     * ResponseEntity with HTTP status of CONFLICT if no discs could be purchased&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/checkCart/{cart_username}&quot;)
+    public ResponseEntity&lt;Disc[]&gt; checkCart(@PathVariable String cart_username) {
+<span class="fc" id="L406">        LOG.info(&quot;PUT /carts/checkCart/&quot; + cart_username);</span>
+        try {
+<span class="fc" id="L408">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="fc bfc" id="L409" title="All 2 branches covered.">            if (cart != null) {</span>
+<span class="fc" id="L410">                HashMap&lt;Integer, Integer&gt; contents = cart.getContents();</span>
+<span class="fc" id="L411">                ArrayList&lt;Disc&gt; conflicts = new ArrayList&lt;&gt;();</span>
+
+<span class="pc bpc" id="L413" title="2 of 4 branches missed.">                if (contents != null &amp;&amp; contents.size() &gt; 0) {</span>
+<span class="fc bfc" id="L414" title="All 2 branches covered.">                    for (int disc_id : contents.keySet()) {</span>
+<span class="fc" id="L415">                        Disc disc = discDao.getDisc(disc_id);</span>
+
+<span class="pc bpc" id="L417" title="1 of 2 branches missed.">                        if (disc != null) {</span>
+                            // Get inventory and purchase quantities:
+<span class="fc" id="L419">                            int iQuantity = disc.getQuantity();</span>
+<span class="fc" id="L420">                            int pQuantity = contents.get(disc_id);</span>
+
+<span class="fc bfc" id="L422" title="All 2 branches covered.">                            if (iQuantity &lt; pQuantity) // Trying to purchase more than available</span>
+<span class="fc" id="L423">                                conflicts.add(new Disc(disc.getId(), disc.getColor(), disc.getWeight(), disc.getType(), disc.getPrice(), iQuantity));</span>
+                        }
+<span class="fc" id="L425">                    }</span>
+
+<span class="fc" id="L427">                    Disc[] conflictingDiscs = new Disc[conflicts.size()];</span>
+<span class="fc" id="L428">                    conflicts.toArray(conflictingDiscs);</span>
+                    
+<span class="fc" id="L430">                    return new ResponseEntity&lt;Disc[]&gt;(conflictingDiscs, HttpStatus.OK);</span>
+                }
+<span class="fc" id="L432">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L434">        catch(IOException e) {</span>
+<span class="fc" id="L435">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L436">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Purchases {@linkplain Disc disc}'s in the {@linkplain Cart cart} with the provided {@linkplain Cart cart} object, if it exists
+     * 
+     * @param cart_username The username associated with the {@link Cart cart} to update
+     * 
+     * @return ResponseEntity with purchases {@link Cart cart} object and HTTP status of OK if discs could be purchased&lt;br&gt;
+     * ResponseEntity with HTTP status of CONFLICT if no discs could be purchased&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;/purchase/{cart_username}&quot;)
+    public ResponseEntity&lt;Disc[]&gt; purchaseCart(@PathVariable String cart_username) {
+<span class="fc" id="L452">        LOG.info(&quot;PUT /carts/purchase/&quot; + cart_username);</span>
+        try {
+<span class="fc" id="L454">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="fc bfc" id="L455" title="All 2 branches covered.">            if (cart != null) {</span>
+<span class="fc" id="L456">                HashMap&lt;Integer, Integer&gt; contents = cart.getContents();</span>
+<span class="fc" id="L457">                ArrayList&lt;Disc&gt; purchases = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L458">                int unpurchasable = 0;</span>
+
+<span class="pc bpc" id="L460" title="2 of 4 branches missed.">                if (contents != null &amp;&amp; contents.size() &gt; 0) {</span>
+<span class="fc bfc" id="L461" title="All 2 branches covered.">                    for (int disc_id : contents.keySet()) {</span>
+<span class="fc" id="L462">                        Disc disc = discDao.getDisc(disc_id);</span>
+
+<span class="fc bfc" id="L464" title="All 2 branches covered.">                        if (disc != null) {</span>
+                            // Get inventory and purchase quantities:
+<span class="fc" id="L466">                            int iQuantity = disc.getQuantity();</span>
+<span class="fc" id="L467">                            int pQuantity = Math.min(contents.get(disc_id), iQuantity);</span>
+
+<span class="fc" id="L469">                            purchases.add(new Disc(disc.getId(), disc.getColor(), disc.getWeight(), disc.getType(), disc.getPrice(), pQuantity)); // Store purchase</span>
+<span class="fc" id="L470">                            cart.removeDisc(disc_id); // Update cart</span>
+                            
+<span class="fc bfc" id="L472" title="All 2 branches covered.">                            if (iQuantity == pQuantity) // Delete disc if bought out</span>
+<span class="fc" id="L473">                                discDao.deleteDisc(disc_id);</span>
+                            else // Otherwise update inventory
+<span class="fc" id="L475">                                discDao.updateDisc(new Disc(disc.getId(), disc.getColor(), disc.getWeight(), disc.getType(), disc.getPrice(), iQuantity - pQuantity));</span>
+                            
+<span class="fc" id="L477">                        } else unpurchasable++;</span>
+<span class="fc" id="L478">                    } cartDao.updateCart(cart);</span>
+                    
+<span class="fc bfc" id="L480" title="All 2 branches covered.">                    if (contents.size() == unpurchasable) // If no discs could be purchased</span>
+<span class="fc" id="L481">                        return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
+
+<span class="fc" id="L483">                    Disc[] purchasedDiscs = new Disc[purchases.size()];</span>
+<span class="fc" id="L484">                    purchases.toArray(purchasedDiscs);</span>
+<span class="fc" id="L485">                    return new ResponseEntity&lt;Disc[]&gt;(purchasedDiscs, HttpStatus.OK);</span>
+                }
+<span class="fc" id="L487">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L489">        catch(IOException e) {</span>
+<span class="fc" id="L490">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L491">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Checks a {@linkplain Disc disc} in the {@linkplain Cart cart} with the provided username and disc_id
+     * 
+     * @param cart_username The username associated with the {@link Cart cart} to update
+     * @param disc_id The ID of the {@linkplain Disc disc} to purchase in the {@link Cart cart}
+     * 
+     * @return ResponseEntity with purchases {@link Cart cart} object and HTTP status of OK if discs could be purchased&lt;br&gt;
+     * ResponseEntity with HTTP status of CONFLICT if no discs could be purchased&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @GetMapping(&quot;/checkOne/{cart_username}/{disc_id}&quot;)
+    public ResponseEntity&lt;Disc&gt; checkOneDisc(@PathVariable String cart_username, @PathVariable int disc_id) {
+<span class="fc" id="L508">        LOG.info(&quot;PUT /carts/checkOne/&quot; + cart_username + &quot;/&quot; + disc_id);</span>
+        try {
+<span class="fc" id="L510">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="fc bfc" id="L511" title="All 2 branches covered.">            if (cart != null) {</span>
+<span class="fc" id="L512">                Disc disc = discDao.getDisc(disc_id);</span>
+
+<span class="fc bfc" id="L514" title="All 2 branches covered.">                if (disc != null) {</span>
+<span class="fc" id="L515">                    int iQuantity = disc.getQuantity();</span>
+<span class="fc" id="L516">                    int pQuantity = cart.getContents().get(disc_id);</span>
+
+<span class="fc bfc" id="L518" title="All 2 branches covered.">                    if (iQuantity &lt; pQuantity)</span>
+<span class="fc" id="L519">                        return new ResponseEntity&lt;Disc&gt;(new Disc(disc.getId(), disc.getColor(), disc.getWeight(), disc.getType(), disc.getPrice(), iQuantity), HttpStatus.OK);</span>
+<span class="fc" id="L520">                    return new ResponseEntity&lt;&gt;(HttpStatus.OK);</span>
+
+<span class="fc" id="L522">                } else return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
+
+<span class="fc" id="L524">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L526">        catch(IOException e) {</span>
+<span class="fc" id="L527">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L528">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Purchases a {@linkplain Disc disc} in the {@linkplain Cart cart} with the provided username and disc_id
+     * 
+     * @param cart_username The username associated with the {@link Cart cart} to update
+     * @param disc_id The ID of the {@linkplain Disc disc} to purchase in the {@link Cart cart}
+     * 
+     * @return ResponseEntity with purchases {@link Cart cart} object and HTTP status of OK if discs could be purchased&lt;br&gt;
+     * ResponseEntity with HTTP status of CONFLICT if no discs could be purchased&lt;br&gt;
+     * ResponseEntity with HTTP status of NOT_FOUND if not found&lt;br&gt;
+     * ResponseEntity with HTTP status of INTERNAL_SERVER_ERROR otherwise
+     */
+    @PutMapping(&quot;/purchaseOne/{cart_username}/{disc_id}&quot;)
+    public ResponseEntity&lt;Disc&gt; purchaseOneDisc(@PathVariable String cart_username, @PathVariable int disc_id) {
+<span class="fc" id="L545">        LOG.info(&quot;PUT /carts/purchaseOne/&quot; + cart_username + &quot;/&quot; + disc_id);</span>
+        try {
+<span class="fc" id="L547">            Cart cart = cartDao.findCart(cart_username);</span>
+<span class="fc bfc" id="L548" title="All 2 branches covered.">            if (cart != null) {</span>
+<span class="fc" id="L549">                Disc disc = discDao.getDisc(disc_id);</span>
+
+<span class="fc bfc" id="L551" title="All 2 branches covered.">                if (disc != null) {</span>
+<span class="fc" id="L552">                    int iQuantity = disc.getQuantity();</span>
+<span class="fc" id="L553">                    int pQuantity = Math.min(cart.getContents().get(disc_id), iQuantity);</span>
+<span class="fc" id="L554">                    Disc updatedDisc = new Disc(disc.getId(), disc.getColor(), disc.getWeight(), disc.getType(), disc.getPrice(), iQuantity - pQuantity);</span>
+
+<span class="fc bfc" id="L556" title="All 2 branches covered.">                    if (iQuantity == pQuantity) // Delete disc if bought out</span>
+<span class="fc" id="L557">                        discDao.deleteDisc(disc_id);</span>
+                    else // Otherwise update inventory
+<span class="fc" id="L559">                        discDao.updateDisc(updatedDisc); // Difference in quantity for inventory</span>
+
+<span class="fc" id="L561">                    cart.removeDisc(disc_id); // Update cart</span>
+<span class="fc" id="L562">                    cartDao.updateCart(cart); // Update DAO</span>
+
+<span class="fc" id="L564">                    updatedDisc.setQuantity(pQuantity); // Quantity purchased for return</span>
+<span class="fc" id="L565">                    return new ResponseEntity&lt;Disc&gt;(updatedDisc, HttpStatus.OK);</span>
+
+<span class="fc" id="L567">                } else return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
+
+<span class="fc" id="L569">            } return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="fc" id="L571">        catch(IOException e) {</span>
+<span class="fc" id="L572">            LOG.log(Level.SEVERE,e.getLocalizedMessage());</span>
+<span class="fc" id="L573">            return new ResponseEntity&lt;&gt;(HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

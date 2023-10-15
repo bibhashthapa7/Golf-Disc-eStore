@@ -1,0 +1,178 @@
+/* Month header */
+.month {
+  padding: 70px 25px;
+  width: 100%;
+  background: #1abc9c;
+  text-align: center;
+}
+
+/* Month list */
+.month ul {
+  margin: 0;
+  padding: 0;
+}
+
+.month ul li {
+  color: white;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+/* Previous button inside month header */
+.month .prev {
+  float: left;
+  padding-top: 10px;
+}
+
+/* Next button */
+.month .next {
+  float: right;
+  padding-top: 10px;
+}
+
+/* Weekdays (Mon-Sun) */
+.weekdays {
+  margin: 0;
+  padding: 10px 0;
+  background-color:#ddd;
+}
+
+.weekdays li {
+  display: inline-block;
+  width: 13.6%;
+  color: #666;
+  text-align: center;
+}
+
+/* Days (1-31) */
+.days {
+  padding: 10px 0;
+  background: #eee;
+  margin: 0;
+}
+
+.days li {
+  list-style-type: none;
+  display: inline-block;
+  width: 13.6%;
+  text-align: center;
+  margin-bottom: 5px;
+  font-size:12px;
+  color: #777;
+}
+
+/* Highlight the "current" day */
+.days li .active {
+  padding: 5px;
+  background: slateblue;
+  color: white !important
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0 15px;
+}
+
+th,td {
+  width: 150px;
+  text-align: center;
+  padding: 3px;
+}
+
+h2 {
+  color: #88bbf8;
+}
+
+select {
+    width: 150px;
+    padding: 5px 35px 5px 5px;
+    font-size: 16px;
+    border: 1px solid #CCC;
+    height: 34px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.btn {
+  display: inline-block;
+  border-radius: 2px;
+  height: 30px;
+
+  text-decoration:none;
+  font-family:'Roboto',sans-serif;
+  font-size: 14px;
+  font-weight:400;
+
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #FFFFFF;
+  background-color: lightslategrey;
+  box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.10);
+}
+
+input {
+    border: none;
+    border-bottom: 1px solid #9E9E9E;
+    display: block;
+    font-size: 16px;
+    padding: 8px 0px;
+    -webkit-transition: 0.2s border-bottom;
+    transition: 0.2s border-bottom;
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .styled-table {
+    border-collapse: collapse;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    min-width: 300px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    background-color: white;
+}
+.styled-table thead tr {
+    background-color: slateblue;
+    color: #ffffff;
+    text-align: left;
+}
+.styled-table th,
+.styled-table td {
+    padding: 10px 15px;
+}
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid slateblue;
+}
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: slateblue;
+}
+
+.content {
+  /*A box that the form resides in - centered vertically and horizontally based on the window. The max-width and % width combo allow it to resize for small devices*/  
+    background: #FFF;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: block;
+    height: 180px;
+    width: 150px;
+    z-index: 2;
+    font-family: 'Roboto', sans-serif;
+    
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border-top: 10px solid slateblue;
+    margin-left: 25px;
+  }

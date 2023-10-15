@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LessonFileDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">discgolf-api</a> &gt; <a href="index.source.html" class="el_package">com.discgolf.api.discgolfapi.persistence</a> &gt; <span class="el_source">LessonFileDAO.java</span></div><h1>LessonFileDAO.java</h1><pre class="source lang-java linenums">package com.discgolf.api.discgolfapi.persistence;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import com.discgolf.api.discgolfapi.model.Lesson;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+/**
+ * Implements the functionality for JSON file-based peristance for Lessons
+ * 
+ * {@literal @}Component Spring annotation instantiates a single instance of this
+ * class and injects the instance into other classes as needed
+ * 
+ * @author SWEN Faculty + coolname
+ */
+@Component
+public class LessonFileDAO implements LessonDAO {
+    Map&lt;Integer,Lesson&gt; lessons;   // Provides a local cache of the lesson objects
+                                // so that we don't need to read from the file
+                                // each time
+    private ObjectMapper objectMapper;  // Provides conversion between Lesson
+                                        // objects and JSON text format written
+                                        // to the file
+    private static int nextId;  // The next Id to assign to a new lesson
+    private String filename;    // Filename to read from and write to
+
+    /**
+     * Creates a Lesson File Data Access Object
+     * 
+     * @param filename Filename to read from and write to
+     * @param objectMapper Provides JSON Object to/from Java Object serialization and deserialization
+     * 
+     * @throws IOException when file cannot be accessed or read from
+     */
+<span class="fc" id="L49">    public LessonFileDAO(@Value(&quot;${lessons.file}&quot;) String filename,ObjectMapper objectMapper) throws IOException {</span>
+<span class="fc" id="L50">        this.filename = filename;</span>
+<span class="fc" id="L51">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L52">        load();  // load the lessons from the file</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * Generates the next id for a new {@linkplain Lesson lesson}
+     * 
+     * @return The next id
+     */
+    private synchronized static int nextId() {
+<span class="fc" id="L61">        int id = nextId;</span>
+<span class="fc" id="L62">        ++nextId;</span>
+<span class="fc" id="L63">        return id;</span>
+    }
+
+    /**
+     * Generates an array of {@linkplain Lesson lessons} from the tree map
+     * 
+     * @return  The array of {@link Lesson lessons}, may be empty
+     */
+    private Lesson[] getLessonsArray() {
+<span class="fc" id="L72">        return getLessonsArray(null);</span>
+    }
+
+    /**
+     * Generates an array of {@linkplain Lesson lessons} from the tree map for any
+     * {@linkplain Lesson lessons} titles that contain text specified by containsText
+     * &lt;br&gt;
+     * If textContains is Null, the array contains all of the {@linkplain Lesson lessons}
+     * in the tree map
+     * 
+     * @return  The array of {@link Lesson lessons}, may be empty
+     */
+    private Lesson[] getLessonsArray(String text) { // if typeToMatch == -1, no filter
+<span class="fc" id="L85">        ArrayList&lt;Lesson&gt; lessonArrayList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        for (Lesson lesson : lessons.values()) {</span>
+<span class="pc bpc" id="L88" title="3 of 4 branches missed.">            if (text == null || lesson.getTitle().toLowerCase().contains(text.toLowerCase())) {</span>
+<span class="fc" id="L89">                lessonArrayList.add(lesson);</span>
+            }
+<span class="fc" id="L91">        }</span>
+
+<span class="fc" id="L93">        Lesson[] lessonArray = new Lesson[lessonArrayList.size()];</span>
+<span class="fc" id="L94">        lessonArrayList.toArray(lessonArray);</span>
+<span class="fc" id="L95">        return lessonArray;</span>
+    }
+
+    /**
+     * Generates an array of {@linkplain Lesson lessons} from the tree map for any
+     * {@linkplain Lesson lessons} titles that contain text specified by containsText that are in inventory
+     * &lt;br&gt;
+     * If textContains is Null, the array contains all of the {@linkplain Lesson lessons}
+     * in the tree map
+     * 
+     * @return  The array of {@link Lesson lessons}, may be empty
+     */
+    private Lesson[] getInvenLessonsArray(String text) {
+<span class="fc" id="L108">            ArrayList&lt;Lesson&gt; lessonArrayList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L110" title="All 2 branches covered.">            for (Lesson lesson : lessons.values()) {</span>
+<span class="pc bpc" id="L111" title="1 of 6 branches missed.">                if (lesson.getUsername() == null &amp;&amp; (text == null || lesson.getTitle().toLowerCase().contains(text.toLowerCase())))</span>
+<span class="fc" id="L112">                    lessonArrayList.add(lesson);</span>
+<span class="fc" id="L113">            }</span>
+
+<span class="fc" id="L115">            Lesson[] lessonArray = new Lesson[lessonArrayList.size()];</span>
+<span class="fc" id="L116">            lessonArrayList.toArray(lessonArray);</span>
+<span class="fc" id="L117">            return lessonArray;</span>
+    }
+
+    /**
+     * Saves the {@linkplain Lesson lessons} from the map into the file as an array of JSON objects
+     * 
+     * @return true if the {@link Lesson lessons} were written successfully
+     * 
+     * @throws IOException when file cannot be accessed or written to
+     */
+    private boolean save() throws IOException {
+<span class="fc" id="L128">        Lesson[] lessonArray = getLessonsArray();</span>
+
+        // Serializes the Java Objects to JSON objects into the file
+        // writeValue will thrown an IOException if there is an issue
+        // with the file or reading from the file
+<span class="fc" id="L133">        objectMapper.writeValue(new File(filename),lessonArray);</span>
+<span class="fc" id="L134">        return true;</span>
+    }
+
+    /**
+     * Loads {@linkplain Lesson lessons} from the JSON file into the map
+     * &lt;br&gt;
+     * Also sets next id to one more than the greatest id found in the file
+     * 
+     * @return true if the file was read successfully
+     * 
+     * @throws IOException when file cannot be accessed or read from
+     */
+    private boolean load() throws IOException {
+<span class="fc" id="L147">        lessons = new TreeMap&lt;&gt;();</span>
+<span class="fc" id="L148">        nextId = 0;</span>
+
+        // Deserializes the JSON objects from the file into an array of lessons
+        // readValue will throw an IOException if there's an issue with the file
+        // or reading from the file
+<span class="fc" id="L153">        Lesson[] lessonArray = objectMapper.readValue(new File(filename),Lesson[].class);</span>
+
+        // Add each lesson to the tree map and keep track of the greatest id
+<span class="fc bfc" id="L156" title="All 2 branches covered.">        for (Lesson lesson : lessonArray) {</span>
+<span class="fc" id="L157">            lessons.put(lesson.getId(),lesson);</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">            if (lesson.getId() &gt; nextId)</span>
+<span class="fc" id="L159">                nextId = lesson.getId();</span>
+        }
+        // Make the next id one greater than the maximum from the file
+<span class="fc" id="L162">        ++nextId;</span>
+<span class="fc" id="L163">        return true;</span>
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Lesson[] getLessons() {
+<span class="fc" id="L171">        synchronized(lessons) {</span>
+<span class="fc" id="L172">            return getInvenLessonsArray(null);</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Lesson[] findLessons(String text) {
+<span class="fc" id="L181">        synchronized(lessons) {</span>
+<span class="fc" id="L182">            return getInvenLessonsArray(text);</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Lesson getLesson(int id) {
+<span class="fc" id="L191">        synchronized(lessons) {</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">            if (lessons.containsKey(id))</span>
+<span class="fc" id="L193">                return lessons.get(id);</span>
+            else
+<span class="fc" id="L195">                return null;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Lesson[] getLessonsByUser(String username) {
+<span class="fc" id="L204">        synchronized(lessons) {</span>
+<span class="fc" id="L205">            ArrayList&lt;Lesson&gt; lessonArrayList = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L207" title="All 2 branches covered.">            for (Lesson lesson : lessons.values()) {</span>
+<span class="fc" id="L208">                String lesson_username = lesson.getUsername();</span>
+<span class="pc bpc" id="L209" title="3 of 4 branches missed.">                if (lesson_username != null &amp;&amp; lesson_username.equalsIgnoreCase(username))</span>
+<span class="nc" id="L210">                    lessonArrayList.add(lesson);</span>
+<span class="fc" id="L211">            }</span>
+
+<span class="fc" id="L213">            Lesson[] lessonArray = new Lesson[lessonArrayList.size()];</span>
+<span class="fc" id="L214">            lessonArrayList.toArray(lessonArray);</span>
+<span class="fc" id="L215">            return lessonArray;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Lesson createLesson(Lesson lesson) throws IOException {
+<span class="fc" id="L224">        synchronized(lessons) {</span>
+            // We create a new lesson object because the id field is immutable
+            // and we need to assign the next unique id
+<span class="fc" id="L227">            Lesson newLesson = new Lesson(nextId(), lesson.getUsername(), lesson.getTitle(),</span>
+<span class="fc" id="L228">                                    lesson.getDescription(), lesson.getDays(), </span>
+<span class="fc" id="L229">                                    lesson.getStartDate(), lesson.getEndDate(), lesson.getPrice());</span>
+<span class="fc" id="L230">            lessons.put(newLesson.getId(),newLesson);</span>
+<span class="fc" id="L231">            save(); // may throw an IOException</span>
+<span class="fc" id="L232">            return newLesson;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public Lesson updateLesson(Lesson lesson) throws IOException {
+<span class="fc" id="L241">        synchronized(lessons) {</span>
+<span class="fc bfc" id="L242" title="All 2 branches covered.">            if (lessons.containsKey(lesson.getId()) == false)</span>
+<span class="fc" id="L243">                return null;  // lesson does not exist</span>
+
+<span class="fc" id="L245">            lessons.put(lesson.getId(),lesson);</span>
+<span class="fc" id="L246">            save(); // may throw an IOException</span>
+<span class="fc" id="L247">            return lesson;</span>
+        }
+    }
+
+    /**
+    ** {@inheritDoc}
+     */
+    @Override
+    public boolean deleteLesson(int id) throws IOException {
+<span class="fc" id="L256">        synchronized(lessons) {</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">            if (lessons.containsKey(id)) {</span>
+<span class="fc" id="L258">                lessons.remove(id);</span>
+<span class="fc" id="L259">                return save();</span>
+            }
+            else
+<span class="fc" id="L262">                return false;</span>
+        }
+    }
+    
+    @Override
+    public Lesson[] getLessonsOnDate(String date) throws IOException {
+<span class="nc" id="L268">        return Arrays.stream(getLessons()).filter(e -&gt; validateLesson(e, date)).toArray(size -&gt; new Lesson[size]);</span>
+    }
+
+        /**
+     * Helper method to determine if a lesson is held on a specific date
+     * @param lesson lesson object in question
+     * @param date date string being quieried 
+     */
+    boolean validateLesson(Lesson lesson, String date) {
+<span class="fc" id="L277">        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(&quot;MM/dd/yyyy&quot;);</span>
+<span class="fc" id="L278">        LocalDate dateHeld = LocalDate.parse(date, dateFormat); // the date being asked about</span>
+<span class="fc" id="L279">        LocalDate lessonStartDate = LocalDate.parse(lesson.getStartDate(), dateFormat); // date obj of when this specific start</span>
+<span class="fc" id="L280">        LocalDate lessonEndDate = LocalDate.parse(lesson.getEndDate(), dateFormat); // date obj when lesson ends meeting</span>
+        
+        // map made and populated to help parse string representation of when lessons are held to DayOfWeek enum
+<span class="fc" id="L283">        Map&lt;String, DayOfWeek&gt; daysKey = new HashMap&lt;String, DayOfWeek&gt;();</span>
+<span class="fc" id="L284">        daysKey.put(&quot;M&quot;, DayOfWeek.MONDAY);</span>
+<span class="fc" id="L285">        daysKey.put(&quot;Tu&quot;, DayOfWeek.TUESDAY);</span>
+<span class="fc" id="L286">        daysKey.put(&quot;W&quot;, DayOfWeek.WEDNESDAY);</span>
+<span class="fc" id="L287">        daysKey.put(&quot;Th&quot;, DayOfWeek.THURSDAY);</span>
+<span class="fc" id="L288">        daysKey.put(&quot;F&quot;, DayOfWeek.FRIDAY);</span>
+<span class="fc" id="L289">        daysKey.put(&quot;Sat&quot;, DayOfWeek.SATURDAY);</span>
+<span class="fc" id="L290">        daysKey.put(&quot;Sun&quot;, DayOfWeek.SUNDAY);</span>
+        
+<span class="fc" id="L292">        Set&lt;DayOfWeek&gt; daysHeld = new HashSet&lt;&gt;();</span>
+
+<span class="fc bfc" id="L294" title="All 2 branches covered.">        for(String x : daysKey.keySet()) {</span>
+<span class="fc bfc" id="L295" title="All 2 branches covered.">            if(lesson.getDays().toLowerCase().contains(x.toLowerCase())) {</span>
+<span class="fc" id="L296">                daysHeld.add(daysKey.get(x));</span>
+            }
+<span class="fc" id="L298">        }</span>
+
+        //  if date is before start          or       if date is after the end date
+<span class="pc bpc" id="L301" title="2 of 4 branches missed.">        if(dateHeld.compareTo(lessonStartDate) &lt; 0 || dateHeld.compareTo(lessonEndDate) &gt; 0) {</span>
+<span class="nc" id="L302">            return false;</span>
+        }
+        // it is within valid range of dates that the lesson is taught so now return 
+        // boolean of whether the date in question is a day (Day of Week) that the lesson is taught
+<span class="fc" id="L306">        return daysHeld.contains(dateHeld.getDayOfWeek());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

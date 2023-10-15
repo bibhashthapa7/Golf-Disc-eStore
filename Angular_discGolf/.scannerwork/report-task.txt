@@ -1,0 +1,6 @@
+projectKey=discgolf-app
+serverUrl=http://localhost:9000
+serverVersion=9.7.1.62043
+dashboardUrl=http://localhost:9000/dashboard?id=discgolf-app
+ceTaskId=AYS7qKoj9ULaVs1O-FNo
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYS7qKoj9ULaVs1O-FNo

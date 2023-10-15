@@ -1,0 +1,152 @@
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    font-family: 'Roboto', sans-serif;
+    font-size: 24px;
+  }
+
+  .shopping-cart {
+    width: 750px;
+    margin: 40px auto;
+    background: #FFFFFF;
+    box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.10);
+    border-radius: 6px;
+
+    display: flex;
+    flex-direction: column;
+    border-top: 10px solid slateblue;
+  }
+
+  .purchaseB {
+    display: inline-block;
+    border-radius: 2px;
+    height: 30px;
+
+    text-decoration:none;
+    font-family:'Roboto',sans-serif;
+    font-size: 14px;
+    font-weight:400;
+
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #FFFFFF;
+    background-color: lightslategrey;
+  }
+
+  .title {
+    height: 60px;
+    border-bottom: 1px solid #E1E8EE;
+    padding: 20px 30px;
+    color: lightslategrey;
+    font-size: 18px;
+    font-weight: 400;
+  }
+
+  .item_image {
+    margin-inline: 25px;
+    height: 100px;
+  }
+   
+  .item {
+    border-bottom:  1px solid #E1E8EE;
+    height: 120px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+   
+  .description {
+    align-items: center;
+  }
+
+  .description button {
+    box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.10);
+  }
+   
+  .description span {
+    display: block;
+    font-size: 14px;
+    color: lightslategrey;
+    font-weight: 400;
+  }
+   
+  .description span:first-child {
+    margin-bottom: 5px;
+  }
+  .item .description span:last-child {
+    font-weight: 300;
+    margin-top: 8px;
+    color: #86939E;
+  }
+   
+  .checkout {
+    height: 120px;
+    display: flex;
+    align-items: center;
+  }
+
+@media (max-width: 800px) {
+  .shopping-cart {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+  }
+  .item {
+    height: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .description {
+    width: 100%;
+    text-align: center;
+    margin: 6px 0;
+  }
+}
+
+.quantity {
+    display: flex;
+    background-color: lightslategrey;
+    border-radius: 45px;
+    width: 100px;
+    box-shadow: 1px 2px 3px 0px rgba(0,0,0,0.10);
+}
+
+.quantity span {
+    text-align: center;
+    font-size: 14px;
+    border: none;
+    background-color: lightslategrey;
+    color: white;
+
+    display: inline-flex;
+    align-items: center;
+    margin-inline: 5px;
+}
+
+.quantity button {
+    font-size: 18px;
+    cursor: pointer;
+    border: none;
+    background-color: lightslategrey;
+    color: white;
+
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    margin: 0;
+}
+
+.decrement {
+    font-size: 18px;
+    border-radius: 45px 0 0 45px;
+}
+.increment {
+  font-size: 14px;
+    border-radius: 0 45px 45px 0;
+}

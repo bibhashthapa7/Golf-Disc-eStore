@@ -1,0 +1,36 @@
+<!-- <h2>Welcome to the lessons page</h2>
+<h4>This where you can schedule lessons with coaches at Acadia Disc Golf</h4>
+<p>Check out the calendar below that details when we have slots for lessons!</p> -->
+<body>
+       <div style="font-family: 'Roboto',sans-serif; color: slategray; display: flex; align-items: center; justify-content: center; margin-top: 40px;">
+              <table class="styled-table">
+                     <thead>
+                            <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Days</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Cost</th>
+                            <th></th>
+                            </tr>
+                     </thead>
+                     <tbody>
+                            <tr *ngFor="let lesson of lessons">
+                                   <td id="lessonTitle">{{lesson.title}}</td>
+                                   <td id="lessonDescription">{{lesson.description}}</td>
+                                   <td id="lessonDays">{{lesson.days}}</td>
+                                   <td id="lessonStart">{{lesson.startDate}}</td>
+                                   <td id="lessonEnd">{{lesson.endDate}}</td>
+                                   <td id="lessonPrice">{{lesson.price}}</td>
+                                   <button class="btn" (click)="purchaseLesson(lesson)">Subscribe</button>
+                            </tr>
+                     </tbody>
+              </table>
+              <div class="content">
+                     <input class="btn" style="background-color: white; color: slategray; width: 120px;" type="date" id="selectedDate" name="lessons-start" (change)="getDate()"><br>
+                     <button class="btn" style="width: 120px; margin: 0" (click)="getLessonsByDate()">Search Date</button><br>
+                     <button class="btn" style="width: 120px; margin: 0" (click)="getLessons()">Clear</button>
+              </div>
+       </div>
+</body>

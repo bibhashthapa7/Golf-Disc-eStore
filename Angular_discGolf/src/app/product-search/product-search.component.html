@@ -1,0 +1,19 @@
+<div id="search-component">
+    <label for="search-box">Disc Search</label>
+    <input #searchBox id="search-box" (input)="search(searchBox.value)" />
+    <select #filter style="height: 31px; border-radius: 8px; border: none; margin-left: 3px; text-align: center; color: slategray;" (change)="updateFilter(filter.value)">
+      <option default value="0"></option>
+      <option value="1">Type</option>
+      <option value="2">Color</option>
+      <option value="3">Weight</option>
+      <option value="4">Price</option>
+    </select>
+  
+    <ul class="search-result">
+      <li *ngFor="let product of products$ | async" >
+        <a href="/product/{{product.id}}">
+          {{product.type}} ({{product.color}})
+        </a>
+      </li>
+    </ul>
+  </div>
